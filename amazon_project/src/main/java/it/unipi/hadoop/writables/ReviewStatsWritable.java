@@ -1,4 +1,4 @@
-package it.unipi.hadoop.writable;
+package it.unipi.hadoop.writables;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -13,11 +13,14 @@ public class ReviewStatsWritable implements Writable
     private int verifiedCount;
     private int helpfulVotes;
     private int totalVotes;
-    private Text category;
+    private String category;
+    private String productTitle;
 
-    public ReviewStatsWritable() {}
+    public ReviewStatsWritable() {
+        category = new Text();
+    }
 
-     public ReviewStatsWritable(int reviewCount, double ratingSum, int verifiedCount, int helpfulVotes, int totalVotes, Text category)
+     public ReviewStatsWritable(int reviewCount, double ratingSum, int verifiedCount, int helpfulVotes, int totalVotes, String category, String productTitle)
     {
         this.reviewCount = reviewCount;
         this.ratingSum = ratingSum;
@@ -25,30 +28,45 @@ public class ReviewStatsWritable implements Writable
         this.helpfulVotes = helpfulVotes;
         this.totalVotes = totalVotes;
         this.category = category;
+        this.productTitle = productTitle;
     }
 
     public int getReviewCount() { return reviewCount; }
-    public double getRatingSum()   { return ratingSum; }
+    public double getRatingSum() { return ratingSum; }
     public int getVerifiedCount() { return verifiedCount; }
     public int getHelpfulVotes() { return helpfulVotes; }
     public int getTotalVotes() { return totalVotes; }
     public Text getCategory() { return category; }
+    public String getProductTitle() { return productTitle; }
 
     public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
-    public void setRatingSum(double ratingSum)   { this.ratingSum = ratingSum; }
+    public void setRatingSum(double ratingSum) { this.ratingSum = ratingSum; }
     public void setVerifiedCount(int verifiedCount) { this.verifiedCount = verifiedCount; }
     public void setHelpfulVotes(int helpfulVotes) { this.helpfulVotes = helpfulVotes; }
     public void setTotalVotes(int totalVotes) { this.totalVotes = totalVotes; }
-    public void setCategory(Text category) { this.category = category; }
+    public void setCategory(String category) { this.category = category; }
+    public void setProductTitle(String productTitle) { this.productTitle = productTitle; }
+
+    public void set(int reviewCount, double ratingSum, int verifiedCount, int helpfulVotes, int totalVotes, String category, String productTitle)
+    {
+        this.reviewCount = reviewCount;
+        this.ratingSum = ratingSum;
+        this.verifiedCount = verifiedCount;
+        this.helpfulVotes = helpfulVotes;
+        this.totalVotes = totalVotes;
+        this.category = category;
+        this.productTitle = productTitle;
+    }
 
     @Override
     public void readFields(DataInput in) throws IOException{
-        reviewCount=in.readInt();
-        ratingSum=in.readDouble();
-        verifiedCount=in.readInt();
-        helpfulVotes=in.readInt();
-        totalVotes=in.readInt();
-        category.readFields(in);
+        reviewCount = in.readInt();
+        ratingSum = in.readDouble();
+        verifiedCount = in.readInt();
+        helpfulVotes = in.readInt();
+        totalVotes = in.readInt();
+        category = in.readUTF();
+        productTitle = in.readUTF();
     }
 
     @Override
@@ -58,16 +76,18 @@ public class ReviewStatsWritable implements Writable
         out.writeInt(verifiedCount);
         out.writeInt(helpfulVotes);
         out.writeInt(totalVotes);
-        category.write(out);
+        category.writeUTF(out);
+        productTitle.writUTF(out);
     }
 
     @Override
     public String toString() {
-        return reviewCount + "," +
-            ratingSum + "," +
-            verifiedCount + "," +
-            helpfulVotes + "," +
-            totalVotes + "," +
-            category;
+        return productTitle + "," +
+           category + "," +
+           reviewCount + "," +
+           ratingSum + "," +
+           verifiedCount + "," +
+           helpfulVotes + "," +
+           totalVotes;
     }
 }
