@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.Text;
 
 public class ReviewStatsWritable implements Writable
 {
@@ -16,11 +15,9 @@ public class ReviewStatsWritable implements Writable
     private String category;
     private String productTitle;
 
-    public ReviewStatsWritable() {
-        category = new Text();
-    }
+    public ReviewStatsWritable() {} //costruttore vuoto
 
-     public ReviewStatsWritable(int reviewCount, double ratingSum, int verifiedCount, int helpfulVotes, int totalVotes, String category, String productTitle)
+    public ReviewStatsWritable(int reviewCount, double ratingSum, int verifiedCount, int helpfulVotes, int totalVotes, String category, String productTitle)
     {
         this.reviewCount = reviewCount;
         this.ratingSum = ratingSum;
@@ -36,7 +33,7 @@ public class ReviewStatsWritable implements Writable
     public int getVerifiedCount() { return verifiedCount; }
     public int getHelpfulVotes() { return helpfulVotes; }
     public int getTotalVotes() { return totalVotes; }
-    public Text getCategory() { return category; }
+    public String getCategory() { return category; }
     public String getProductTitle() { return productTitle; }
 
     public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
@@ -76,8 +73,8 @@ public class ReviewStatsWritable implements Writable
         out.writeInt(verifiedCount);
         out.writeInt(helpfulVotes);
         out.writeInt(totalVotes);
-        category.writeUTF(out);
-        productTitle.writUTF(out);
+        out.writeUTF(category);
+        out.writeUTF(productTitle);
     }
 
     @Override
