@@ -5,7 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import org.apache.hadoop.io.Writable;
 
-public class CategoryScoreKey implements  Writable, Comparable<CategoryScoreKey>{
+public class CategoryScoreKey implements  WritableComparable<CategoryScoreKey>{
     private String category;
     private double score;
     
