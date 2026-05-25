@@ -124,8 +124,8 @@ public class Job2Ranking
         FileOutputFormat.setOutputPath(job,new Path(otherArgs[1]));
 
         job.setInputFormatClass(TextInputFormat.class);        
-        job.setOutputFormatClass(TextOutputFormat.class
+        job.setOutputFormatClass(TextOutputFormat.class);
      
-   System.exit(job.waitForCompletion(true) ? 0 : 1);
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
