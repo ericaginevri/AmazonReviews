@@ -141,15 +141,15 @@ public class Job1Aggregation
         job.setReducerClass(ReviewReducer.class);
         job.setNumReduceTasks(2);
 
-        // mapper output
+        //mapper output
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(ReviewStatsWritable.class);
 
-        // reducer output
+        //reducer output
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
 
-        // input output
+        //input output
         FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
         FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 
