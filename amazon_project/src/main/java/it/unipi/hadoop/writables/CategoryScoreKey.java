@@ -3,7 +3,7 @@ package it.unipi.hadoop;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
 
 public class CategoryScoreKey implements  WritableComparable<CategoryScoreKey>{
     private String category;
