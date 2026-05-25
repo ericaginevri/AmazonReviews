@@ -33,7 +33,7 @@ public class Job2Ranking
             //extract the fields from output of Job1
             String[] fields = line.split("\t");
             String productParent = fields[0];
-            String[] data = fields[1].split(",");
+            String[] data = fields[1].split("###");
             String productTitle = data[0];
             String category = data[1];
             int reviewCount = Integer.parseInt(data[2]);

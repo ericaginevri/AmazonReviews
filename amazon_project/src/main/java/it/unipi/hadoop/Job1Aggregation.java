@@ -117,7 +117,7 @@ public class Job1Aggregation
 
             double avgRating = ratingSum / reviewCount;
 
-            outputValue.set(productTitle + "," + category + "," + reviewCount + "," + avgRating + "," + verifiedCount + "," + helpfulVotes + "," + totalVotes);
+            outputValue.set(productTitle + "###" + category + "###" + reviewCount + "###" + avgRating + "###" + verifiedCount + "###" + helpfulVotes + "###" + totalVotes); //we use ### to split the output since commas appear in the product_title 
 
             context.write(key, outputValue);
         }
