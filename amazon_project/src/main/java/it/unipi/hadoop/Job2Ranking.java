@@ -46,7 +46,7 @@ public class Job2Ranking
             double score = avgRating*Math.log(1+reviewCount)*(1+((double)helpfulVotes/(1+totalVotes)));
 
             outputKey.set(category, score);
-            outputValue.set( productParent + "," + productTitle + "," + score);
+            outputValue.set( productParent + "###" + productTitle + "###" + score);
 
             context.write(outputKey, outputValue);
         }
@@ -78,14 +78,14 @@ public class Job2Ranking
             }
 
             for (Text val : values) {
-                String[] fields = val.toString().split(",");
+                String[] fields = val.toString().split("###");
 
                 String productParent = fields[0];
                 String productTitle = fields[1];
                 String score = fields[2];
 
                 outputKey.set(productParent);
-                outputValue.set(productTitle + "," + currentCategory + "," + score + "," + rank);
+                outputValue.set(productTitle + "###" + currentCategory + "###" + score + "###" + rank);
 
                 context.write(outputKey, outputValue);
 
@@ -109,14 +109,15 @@ public class Job2Ranking
         System.out.println("args[1]: <output>=" + otherArgs[1]);
 
         Job job = Job.getInstance(conf, "Job2Ranking");
-
         job.setJarByClass(Job2Ranking.class);
         job.setMapperClass(RankingMapper.class);
         job.setPartitionerClass(CategoryPartitioner.class);
         job.setReducerClass(RankingReducer.class);
         job.setNumReduceTasks(2);
+
         job.setMapOutputKeyClass(CategoryScoreKey.class);
         job.setMapOutputValueClass(Text.class);
+        
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
 
