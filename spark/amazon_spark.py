@@ -67,7 +67,7 @@ def detect_anomalies(data):
     verified_ratio = ver / count if count > 0 else 0
     
     #thresholds
-    min_helpful_ratio = 0.02
+    min_helpful_ratio = 0.2
     min_verified_ratio = 0.5
     min_reviews_perfect = 100
     
