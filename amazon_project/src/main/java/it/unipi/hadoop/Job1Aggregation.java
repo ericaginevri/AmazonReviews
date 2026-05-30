@@ -128,7 +128,7 @@ public class Job1Aggregation
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 
-        if (otherArgs.length != 2) {
+        if (otherArgs.length != 3) {
             System.err.println("Usage: Job1Aggregation <input> <output>");
             System.exit(1);
         }
@@ -138,7 +138,9 @@ public class Job1Aggregation
         job.setMapperClass(ReviewMapper.class);
         job.setCombinerClass(ReviewCombiner.class);
         job.setReducerClass(ReviewReducer.class);
-        job.setNumReduceTasks(2);
+       
+        int reducers = Integer.parseInt(otherArgs[2]);
+        job.setNumReduceTasks(reducers);
 
         //mapper output
         job.setMapOutputKeyClass(Text.class);

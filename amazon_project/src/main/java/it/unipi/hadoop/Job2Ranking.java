@@ -100,7 +100,7 @@ public class Job2Ranking
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 
-        if (otherArgs.length != 2) {
+        if (otherArgs.length != 3) {
             System.err.println("Usage: Job2Ranking <input> <output>");
             System.exit(1);
         }
@@ -113,7 +113,9 @@ public class Job2Ranking
         job.setMapperClass(RankingMapper.class);
         job.setPartitionerClass(CategoryPartitioner.class);
         job.setReducerClass(RankingReducer.class);
-        job.setNumReduceTasks(2);
+        
+        int reducers = Integer.parseInt(otherArgs[2]);
+        job.setNumReduceTasks(reducers);
 
         job.setMapOutputKeyClass(CategoryScoreKey.class);
         job.setMapOutputValueClass(Text.class);
