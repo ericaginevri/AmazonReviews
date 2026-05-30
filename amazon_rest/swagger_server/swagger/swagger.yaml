@@ -1,0 +1,94 @@
+openapi: 3.0.3
+info:
+  title: Amazon Analytics API
+  version: 1.0.0
+servers:
+- url: http://localhost:8080/v1
+paths:
+  /hadoop:
+    post:
+      summary: Run Hadoop job
+      operationId: run_hadoop
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HadoopRequest"
+        required: true
+      responses:
+        "200":
+          description: Hadoop job started
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /spark:
+    post:
+      summary: Run Spark job
+      operationId: run_spark
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SparkRequest"
+        required: true
+      responses:
+        "200":
+          description: Spark job started
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /results/hadoop:
+    get:
+      summary: Get Hadoop results
+      operationId: get_hadoop_results
+      responses:
+        "200":
+          description: Hadoop results
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /results/spark:
+    get:
+      summary: Get Spark results
+      operationId: get_spark_results
+      responses:
+        "200":
+          description: Spark results
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components:
+  schemas:
+    HadoopRequest:
+      required:
+      - dataset
+      - job1Reducers
+      - job2Reducers
+      - job3Reducers
+      type: object
+      properties:
+        dataset:
+          type: string
+          example: amazon_reviews_250mb.tsv
+        job1Reducers:
+          type: integer
+          example: 2
+        job2Reducers:
+          type: integer
+          example: 2
+        job3Reducers:
+          type: integer
+          example: 2
+    SparkRequest:
+      required:
+      - dataset
+      - job1Partitions
+      - job2Partitions
+      - job3Partitions
+      type: object
+      properties:
+        dataset:
+          type: string
+          example: amazon_reviews_250mb.tsv
+        job1Partitions:
+          type: integer
+          example: 4
+        job2Partitions:
+          type: integer
+          example: 4
+        job3Partitions:
+          type: integer
+          example: 4
+
