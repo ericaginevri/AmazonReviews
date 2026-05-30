@@ -1,0 +1,38 @@
+openapi: 3.0.3
+
+info:
+  title: Amazon Analytics API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/v1
+
+paths:
+  /hadoop:
+    post:
+      summary: Run Hadoop job
+      operationId: run_hadoop
+      responses:
+        '200':
+          description: Hadoop job started
+  /spark:
+    post:
+      summary: Run Spark job
+      operationId: run_spark
+      responses:
+        '200':
+          description: Spark job started
+  /results/hadoop:
+    get:
+      summary: Get Hadoop results
+      operationId: get_hadoop_results
+      responses:
+        '200':
+          description: Hadoop results
+  /results/spark:
+    get:
+      summary: Get Spark results
+      operationId: get_spark_results
+      responses:
+        '200':
+          description: Spark results
