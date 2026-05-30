@@ -67,20 +67,20 @@ def detect_anomalies(data):
     verified_ratio = ver / count if count > 0 else 0
     
     #thresholds
-    min_helpful_ratio = 0.05
-    min_verified_ratio = 0.10
+    min_helpful_ratio = 0.2
+    min_verified_ratio = 0.5
     min_reviews_perfect = 100
     
     anomalies = []
     
     #cerco anomalie
-    if score > 80.0 and helpful_ratio < min_helpful_ratio:
+    if score > 20 and helpful_ratio < min_helpful_ratio:
         anomalies.append(f"{parent}\tHELPFUL_RATIO_ANOMALY###{title}###{category}###{score}")
         
-    if verified_ratio < min_verified_ratio and count > 100 and avg_rating >= 4.5:
+    if verified_ratio < min_verified_ratio and count > 100:
         anomalies.append(f"{parent}\tVERIFIED_RATIO_ANOMALY###{title}###{category}###{score}")
         
-    if avg_rating == 5.0 and count > min_reviews_perfect:
+    if avg_rating == 4.9 and count > min_reviews_perfect:
         anomalies.append(f"{parent}\tSUSPICIOUS_PERFECT_PRODUCT###{title}###{category}###{score}")
         
     if rank <= 10 and avg_rating < 3.5:
