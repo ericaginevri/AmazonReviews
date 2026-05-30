@@ -104,7 +104,6 @@ public class Job1Aggregation
             String category = "";
             String productTitle = "";
 
-
             for (ReviewStatsWritable val : values) {
                 reviewCount += val.getReviewCount();
                 ratingSum += val.getRatingSum();
