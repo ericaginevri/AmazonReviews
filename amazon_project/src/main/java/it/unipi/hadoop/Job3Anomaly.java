@@ -141,8 +141,8 @@ public class Job3Anomaly
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 
-        if (otherArgs.length != 3){
-            System.err.println("Usage: Job3Anomaly <input> <output>");
+        if (otherArgs.length != 4){
+            System.err.println("Usage: Job3Anomaly <input1> <input2> <output> <reducers>");
             System.exit(1);
         }
 
@@ -153,7 +153,9 @@ public class Job3Anomaly
         job.getConfiguration().setDouble("min.verified.ratio", 0.5);
         job.setMapperClass(AnomalyMapper.class);
         job.setReducerClass(AnomalyReducer.class);
-        job.setNumReduceTasks(3);
+
+        int reducers = Integer.parseInt(otherArgs[3]);
+        job.setNumReduceTasks(reducers);
         
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);

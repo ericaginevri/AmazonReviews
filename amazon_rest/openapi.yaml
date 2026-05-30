@@ -12,6 +12,12 @@ paths:
     post:
       summary: Run Hadoop job
       operationId: run_hadoop
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HadoopRequest'
       responses:
         '200':
           description: Hadoop job started
@@ -19,6 +25,12 @@ paths:
     post:
       summary: Run Spark job
       operationId: run_spark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SparkRequest'
       responses:
         '200':
           description: Spark job started
@@ -36,3 +48,45 @@ paths:
       responses:
         '200':
           description: Spark results
+components:
+  schemas:
+    HadoopRequest:
+      type: object
+      properties:
+        dataset:
+          type: string
+          example: amazon_reviews_250mb.tsv
+        job1Reducers:
+          type: integer
+          example: 2
+        job2Reducers:
+          type: integer
+          example: 2
+        job3Reducers:
+          type: integer
+          example: 2
+      required:
+        - dataset
+        - job1Reducers
+        - job2Reducers
+        - job3Reducers
+    SparkRequest:
+      type: object
+      properties:
+        dataset:
+          type: string
+          example: amazon_reviews_250mb.tsv
+        job1Partitions:
+          type: integer
+          example: 4
+        job2Partitions:
+          type: integer
+          example: 4
+        job3Partitions:
+          type: integer
+          example: 4
+      required:
+        - dataset
+        - job1Partitions
+        - job2Partitions
+        - job3Partitions
