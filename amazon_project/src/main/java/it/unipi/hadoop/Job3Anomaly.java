@@ -1,10 +1,11 @@
 package it.unipi.hadoop;
 
 import java.io.IOException;
-import org.apache.hadoop.io.Text;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -109,7 +110,7 @@ public class Job3Anomaly
                 context.write(key, outputValue);
             }
 
-            if (verifiedRatio < minVerifiedRatio && reviewCount > 100){
+            if (verifiedRatio < minVerifiedRatio && reviewCount > minReviewsPerfect){
                 verifiedAnomalies++;
                 outputValue.set("VERIFIED_RATIO_ANOMALY" + "###" + productTitle + "###" + category + "###" + score);
                 context.write(key, outputValue);
