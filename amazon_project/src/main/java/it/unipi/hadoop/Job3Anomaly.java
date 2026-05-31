@@ -158,8 +158,8 @@ public class Job3Anomaly
         job.setNumReduceTasks(reducers);
         
         int minReviewsPerfect = Integer.parseInt(otherArgs[4]);
-        double minHelpfulRatio = Integer.parseInt(otherArgs[5]);
-        double minVerifiedRatio = Integer.parseInt(otherArgs[6]);
+        double minHelpfulRatio = Double.parseDouble(otherArgs[5]);
+        double minVerifiedRatio = Double.parseDouble(otherArgs[6]);
         job.getConfiguration().setInt("min.reviews.perfect", minReviewsPerfect);
         job.getConfiguration().setDouble("min.helpful.ratio", minHelpfulRatio);
         job.getConfiguration().setDouble("min.verified.ratio", minVerifiedRatio);
