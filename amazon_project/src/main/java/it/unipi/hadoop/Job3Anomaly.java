@@ -142,21 +142,27 @@ public class Job3Anomaly
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 
-        if (otherArgs.length != 4){
-            System.err.println("Usage: Job3Anomaly <input1> <input2> <output> <reducers>");
+        if (otherArgs.length != 7){
+            System.err.println(
+                "Usage: Job3Anomaly <input1> <input2> <output> <reducers> <min_reviews_perfect> <min_helpful_ratio> <min_verified_ratio>"
+            );
             System.exit(1);
         }
 
         Job job = Job.getInstance(conf, "Job3Anomaly");
         job.setJarByClass(Job3Anomaly.class);
-        job.getConfiguration().setInt("min.reviews.perfect", 100);
-        job.getConfiguration().setDouble("min.helpful.ratio", 0.2);
-        job.getConfiguration().setDouble("min.verified.ratio", 0.5);
         job.setMapperClass(AnomalyMapper.class);
         job.setReducerClass(AnomalyReducer.class);
 
         int reducers = Integer.parseInt(otherArgs[3]);
         job.setNumReduceTasks(reducers);
+        
+        int minReviewsPerfect = Integer.parseInt(otherArgs[4]);
+        double minHelpfulRatio = Integer.parseInt(otherArgs[5]);
+        double minVerifiedRatio = Integer.parseInt(otherArgs[6]);
+        job.getConfiguration().setInt("min.reviews.perfect", minReviewsPerfect);
+        job.getConfiguration().setDouble("min.helpful.ratio", minHelpfulRatio);
+        job.getConfiguration().setDouble("min.verified.ratio", minVerifiedRatio);
         
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);

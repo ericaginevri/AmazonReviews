@@ -1,7 +1,7 @@
 package it.unipi.hadoop;
 
 import java.io.IOException;
-import it.unipi.hadoop.writables.ReviewStatsWritable;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -14,6 +14,8 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
+
+import it.unipi.hadoop.writables.ReviewStatsWritable;
 
 public class Job1Aggregation
 {
@@ -129,7 +131,7 @@ public class Job1Aggregation
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 
         if (otherArgs.length != 3) {
-            System.err.println("Usage: Job1Aggregation <input> <output>");
+            System.err.println("Usage: Job1Aggregation <input> <output> <reducers>");
             System.exit(1);
         }
 
