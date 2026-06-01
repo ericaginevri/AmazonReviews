@@ -50,7 +50,7 @@ def apply_ranking(category_data):
     
     results = []
     rank = 1
-    for p in sorted_products: # ranking
+    for p in sorted_products: #ranking
         score, parent, title, count, avg_rating, sum_ver, sum_help, sum_tot = p
         results.append((parent, (title, category, score, rank, count, avg_rating, sum_ver, sum_help, sum_tot)))
         rank += 1
@@ -68,7 +68,7 @@ def detect_anomalies(data, min_reviews_perfect, min_helpful_ratio, min_verified_
     
     anomalies = []
     
-    # find anomalies
+    #find anomalies
     if score > 20 and helpful_ratio < min_helpful_ratio:
         anomalies.append(f"{parent}\tHELPFUL_RATIO_ANOMALY###{title}###{category}###{score}")
         
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
     ranked_rdd.map(format_ranking_output).saveAsTextFile(out_ranking)
 
-    anomalies_rdd = ranked_rdd.flatMap(lambda x: detect_anomalies(x, min_helpful_ratio, min_verified_ratio, min_reviews_perfect))
+    anomalies_rdd = ranked_rdd.flatMap(lambda x: detect_anomalies(x, min_reviews_perfect, min_helpful_ratio, min_verified_ratio))
     anomalies_rdd.saveAsTextFile(out_anomalies)
 
     sc.stop()
