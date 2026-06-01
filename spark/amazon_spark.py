@@ -43,14 +43,14 @@ def compute_score_and_prepare_ranking(data):
     return (category, (score, parent, title, count, avg_rating, sum_ver, sum_help, sum_tot))
 
 
-#come reducer job2 - ordiniamo i prodotti 
+#reducer job2 
 def apply_ranking(category_data):
     category, products = category_data
-    sorted_products = sorted(products, key=lambda x: x[0], reverse=True) #ordiniamo
+    sorted_products = sorted(products, key=lambda x: x[0], reverse=True) # sort
     
     results = []
     rank = 1
-    for p in sorted_products: #facciamo rank
+    for p in sorted_products: # ranking
         score, parent, title, count, avg_rating, sum_ver, sum_help, sum_tot = p
         results.append((parent, (title, category, score, rank, count, avg_rating, sum_ver, sum_help, sum_tot)))
         rank += 1
@@ -59,25 +59,20 @@ def apply_ranking(category_data):
 
 
 #mapper job3
-def detect_anomalies(data):
+def detect_anomalies(data, min_reviews_perfect, min_helpful_ratio, min_verified_ratio):
     parent, metrics = data
     title, category, score, rank, count, avg_rating, ver, help, tot = metrics 
     
     helpful_ratio = help / (1 + tot)
     verified_ratio = ver / count if count > 0 else 0
     
-    #thresholds
-    min_helpful_ratio = 0.2
-    min_verified_ratio = 0.5
-    min_reviews_perfect = 100
-    
     anomalies = []
     
-    #cerco anomalie
+    # find anomalies
     if score > 20 and helpful_ratio < min_helpful_ratio:
         anomalies.append(f"{parent}\tHELPFUL_RATIO_ANOMALY###{title}###{category}###{score}")
         
-    if verified_ratio < min_verified_ratio and count > 100:
+    if verified_ratio < min_verified_ratio and count > min_reviews_perfect:
         anomalies.append(f"{parent}\tVERIFIED_RATIO_ANOMALY###{title}###{category}###{score}")
         
     if avg_rating == 4.9 and count > min_reviews_perfect:
@@ -95,10 +90,9 @@ def format_ranking_output(data):
     return f"{parent}\t{title}###{category}###{score}###{rank}"
 
 
-
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Uso corretto: spark-submit amazon_spark.py <input_dataset> <output_ranking> <output_anomalies>")
+    if len(sys.argv) != 7:
+        print("Correct use: spark-submit amazon_spark.py <input_dataset> <output_ranking> <output_anomalies> <min_reviews_perfect> <min_helpful_ratio> <min_verified_ratio>")
         sys.exit(-1)
 
     conf = SparkConf().setAppName("AmazonAnalytics_Spark")
@@ -107,6 +101,9 @@ if __name__ == "__main__":
     input_path = sys.argv[1]
     out_ranking = sys.argv[2]
     out_anomalies = sys.argv[3]
+    min_reviews_perfect = int(sys.argv[4])
+    min_helpful_ratio = float(sys.argv[5])
+    min_verified_ratio = float(sys.argv[6])
 
     raw_rdd = sc.textFile(input_path)
     
@@ -116,8 +113,10 @@ if __name__ == "__main__":
     aggregated_rdd = clean_rdd.map(parse_line).reduceByKey(aggregate_metrics)
     ranked_rdd = aggregated_rdd.map(compute_score_and_prepare_ranking).groupByKey().flatMap(apply_ranking)
     ranked_rdd.cache()
+
     ranked_rdd.map(format_ranking_output).saveAsTextFile(out_ranking)
-    anomalies_rdd = ranked_rdd.flatMap(detect_anomalies)
+
+    anomalies_rdd = ranked_rdd.flatMap(lambda x: detect_anomalies(x, min_helpful_ratio, min_verified_ratio, min_reviews_perfect))
     anomalies_rdd.saveAsTextFile(out_anomalies)
 
     sc.stop()
