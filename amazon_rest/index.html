@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Computing Project - MirandaPriestley Group</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-bg: #f4f7fe;
+            --card-bg: #ffffff;
+            --brand-primary: #4318FF;
+            --brand-secondary: #39B8FF;
+            --text-main: #2B3674;
+            --text-muted: #A3AED0;
+            --success-color: #05CD99;
+            --warning-color: #FFCE20;
+            --border-color: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            padding-bottom: 3rem;
+        }
+
+        /* Hero Header */
+        .dashboard-header {
+            background: linear-gradient(135deg, #11047A 0%, var(--brand-primary) 100%);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            color: white;
+            box-shadow: 0 10px 20px rgba(67, 24, 255, 0.15);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-header::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Typography & Forms */
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 1.5rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            margin-left: 10px;
+            height: 1px;
+            background-color: var(--border-color);
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-select, .form-control {
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            background-color: #F8FAFC;
+            transition: all 0.2s ease;
+        }
+
+        .form-select:focus, .form-control:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.1);
+            background-color: #ffffff;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 0.7rem 1.5rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--brand-primary);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #3311DB;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(67, 24, 255, 0.2);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            border: none;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #04b386;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(5, 205, 153, 0.2);
+        }
+
+        .btn-secondary {
+            background: #F4F7FE;
+            color: var(--brand-primary);
+            border: none;
+        }
+        .btn-secondary:hover {
+            background: #E2E8F0;
+            color: var(--brand-primary);
+        }
+
+        /* Progress Bars */
+        .progress {
+            height: 24px;
+            border-radius: 12px;
+            background-color: #EDF2F7;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+        .progress-bar {
+            font-weight: 600;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.4s ease;
+        }
+        #job1Bar, #sparkBar { background-color: var(--brand-primary); }
+        #job2Bar { background-color: var(--success-color); }
+        #job3Bar { background-color: var(--warning-color); color: #4A5568;}
+
+        /* Tables */
+        .table {
+            vertical-align: middle;
+        }
+        .table thead th {
+            background-color: transparent;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            padding: 1rem;
+        }
+        .table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .job-row {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .job-row:hover td {
+            background-color: #F8FAFC;
+        }
+        .job-row:hover td:first-child {
+            border-left: 3px solid var(--brand-primary);
+        }
+
+        /* Modal specific styling */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        #detailModal .modal-header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+        
+        .metric-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: transform 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Terminal Window for Output */
+        .terminal-header {
+            background: #2D3748;
+            padding: 8px 16px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #FF5F56; }
+        .dot-yellow { background: #FFBD2E; }
+        .dot-green { background: #27C93F; }
+        .result-box {
+            background: #1A202C;
+            color: #A0AEC0;
+            border-radius: 0 0 12px 12px;
+            padding: 1.2rem;
+            font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            max-height: 350px;
+            overflow-x: auto;
+            overflow-y: auto;
+            white-space: pre;
+            border: 1px solid #2D3748;
+        }
+        .result-box::-webkit-scrollbar { width: 8px; height: 8px; }
+        .result-box::-webkit-scrollbar-track { background: #1A202C; }
+        .result-box::-webkit-scrollbar-thumb { background: #4A5568; border-radius: 4px; }
+    </style>
+</head>
+<body class="container mt-4">
+
+    <div class="dashboard-header">
+        <h1 class="mb-2 fw-bold"><i class="fa-brands fa-amazon me-2"></i>Amazon Reviews Dashboard</h1>
+        <p class="mb-0 opacity-75 fw-medium">Cloud Computing Project - MirandaPriestley Group</p>
+    </div>
+
+    <div class="row g-4 mb-4">
+        
+        <div class="col-xl-6 col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa-solid fa-server text-primary"></i> Start Hadoop Pipeline
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <label class="form-label"><i class="fa-solid fa-database text-muted me-1"></i> Input Dataset</label>
+                        <select id="dataset" class="form-select">
+                            <option value="amazon_reviews_250mb.tsv" selected>amazon_reviews_250mb</option> 
+                            <option value="amazon_reviews_500mb.tsv">amazon_reviews_500mb</option> 
+                            <option value="amazon_reviews_750mb.tsv">amazon_reviews_750mb</option> 
+                            <option value="amazon_reviews.tsv">amazon_reviews_complete</option> 
+                        </select>
+                    </div>
+
+                    <div class="section-title">Job 1 - Aggregation</div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Reducers Number</label>
+                            <select id="job1Reducers" class="form-select"> 
+                                <option value="1">1</option> 
+                                <option value="2">2</option> 
+                                <option value="3" selected>3</option> 
+                                <option value="4">4</option> 
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Input Split Size</label>
+                            <select id="splitSize" class="form-select">
+                                <option value="67108864">64 MB</option>
+                                <option value="134217728" selected>128 MB</option>
+                                <option value="268435456">256 MB</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="section-title">Job 2 - Ranking</div>
+                    <div class="mb-3"> 
+                        <label class="form-label">Reducers Number</label> 
+                        <select id="job2Reducers" class="form-select"> 
+                            <option value="1">1</option> 
+                            <option value="2">2</option> 
+                            <option value="3" selected>3</option> 
+                            <option value="4">4</option> 
+                        </select> 
+                    </div>
+
+                    <div class="section-title">Job 3 - Anomaly</div>
+                    <div class="mb-3"> 
+                        <label class="form-label">Reducers Number</label> 
+                        <select id="job3Reducers" class="form-select"> 
+                            <option value="1">1</option> 
+                            <option value="2">2</option> 
+                            <option value="3" selected>3</option> 
+                            <option value="4">4</option> 
+                        </select> 
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Min Reviews Perfect</label>
+                            <input id="minReviews" type="number" min="50" value="100" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Min Helpful Ratio</label>
+                            <select id="minHelpful" class="form-select">
+                                <option value="0.1">0.1</option><option value="0.2" selected>0.2</option><option value="0.3">0.3</option>
+                                <option value="0.4">0.4</option><option value="0.5">0.5</option><option value="0.6">0.6</option>
+                                <option value="0.7">0.7</option><option value="0.8">0.8</option><option value="0.9">0.9</option><option value="1.0">1.0</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Min Verified Ratio</label>
+                            <select id="minVerified" class="form-select">
+                                <option value="0.1">0.1</option><option value="0.2">0.2</option><option value="0.3">0.3</option>
+                                <option value="0.4">0.4</option><option value="0.5" selected>0.5</option><option value="0.6">0.6</option>
+                                <option value="0.7">0.7</option><option value="0.8">0.8</option><option value="0.9">0.9</option><option value="1.0">1.0</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary w-100 mb-4 py-2" onclick="startHadoopJob()">
+                        <i class="fa-solid fa-play"></i> Launch Hadoop Pipeline
+                    </button>
+
+                    <div class="bg-light p-3 rounded-3 border">
+                        <h6 class="fw-bold mb-3" style="font-size:0.85rem;"><i class="fa-solid fa-bars-progress text-primary me-2"></i>Pipeline Progress</h6>
+                        <div class="progress"><div id="job1Bar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%">Job1</div></div>
+                        <div class="progress"><div id="job2Bar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%">Job2</div></div>
+                        <div class="progress mb-0"><div id="job3Bar" class="progress-bar progress-bar-striped progress-bar-animated text-dark" style="width:0%">Job3</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa-solid fa-bolt" style="color: #FF9900;"></i> Start Spark Job
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <label class="form-label"><i class="fa-solid fa-database text-muted me-1"></i> Input Dataset</label>
+                        <select id="sparkDataset" class="form-select">
+                            <option value="amazon_reviews_250mb.tsv" selected>amazon_reviews_250mb</option>
+                            <option value="amazon_reviews_500mb.tsv">amazon_reviews_500mb</option>
+                            <option value="amazon_reviews_750mb.tsv">amazon_reviews_750mb</option>
+                            <option value="amazon_reviews.tsv">amazon_reviews_complete</option>
+                        </select>
+                    </div>
+
+                    <div class="section-title">Anomaly Parameters</div>
+                    <div class="mb-3">
+                        <label class="form-label">Min Reviews Perfect</label>
+                        <input id="sparkMinReviews" type="number" min="50" value="100" class="form-control">
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Min Helpful Ratio</label>
+                            <select id="sparkMinHelpful" class="form-select">
+                                <option value="0.1">0.1</option><option value="0.2" selected>0.2</option>
+                                <option value="0.3">0.3</option><option value="0.5">0.5</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Min Verified Ratio</label>
+                            <select id="sparkMinVerified" class="form-select">
+                                <option value="0.1">0.1</option><option value="0.2">0.2</option>
+                                <option value="0.3">0.3</option><option value="0.5" selected>0.5</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success w-100 mb-4 py-2" onclick="startSparkJob()">
+                        <i class="fa-solid fa-rocket"></i> Launch Spark Job
+                    </button>
+
+                    <div class="bg-light p-3 rounded-3 border">
+                        <h6 class="fw-bold mb-3" style="font-size:0.85rem;"><i class="fa-solid fa-bars-progress text-success me-2"></i>Job Progress</h6>
+                        <div class="progress mb-0">
+                            <div id="sparkBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%">Spark</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div><i class="fa-solid fa-list-check text-primary"></i> Job Execution History</div>
+            <button class="btn btn-sm btn-secondary" onclick="loadJobs()">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Job ID</th>
+                            <th>Name</th>
+                            <th>State</th>
+                            <th>Type</th>
+                            <th>Started At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobsTable">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="modalTitle"><i class="fa-solid fa-microchip me-2"></i>Job Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4" id="modalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-3 text-muted fw-medium">Fetching telemetry...</p>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-top-0">
+                <button id="btnDownloadResultRanking" class="btn btn-primary d-none shadow-sm" onclick="downloadResult('ranking')">
+                    <i class="fa-solid fa-download"></i> Download Ranking
+                </button>
+                <button id="btnDownloadResultAnomalies" class="btn btn-primary d-none shadow-sm" onclick="downloadResult('anomalies')">
+                    <i class="fa-solid fa-download"></i> Download Anomalies
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+const API_BASE = "http://10.1.1.124:8080";
+let currentPipelineId = null;
+let monitorInterval = null;
+if (monitorInterval) clearInterval(monitorInterval);
+
+let sparkJobId = null;
+let sparkMonitorInterval = null;
+
+async function startSparkJob() {
+    document.getElementById("sparkBar").style.width = "100%";
+    document.getElementById("sparkBar").innerHTML = "Waiting";
+
+    const response = await fetch(API_BASE + "/jobs/spark", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            dataset: document.getElementById("sparkDataset").value,
+            minReviewsPerfect: parseInt(document.getElementById("sparkMinReviews").value),
+            minHelpfulRatio: parseFloat(document.getElementById("sparkMinHelpful").value),
+            minVerifiedRatio: parseFloat(document.getElementById("sparkMinVerified").value)
+        })
+    });
+    const data = await response.json();
+
+    sparkJobId = data.jobId;
+    startSparkMonitoring();
+}
+
+function startSparkMonitoring() {
+    if (sparkMonitorInterval) clearInterval(sparkMonitorInterval);
+    sparkMonitorInterval = setInterval(updateSparkStatus, 3000);
+}
+
+async function updateSparkStatus() {
+    if (!sparkJobId) return;
+
+    const resp = await fetch(`${API_BASE}/jobs/${sparkJobId}`);
+    const job  = await resp.json();
+
+    const progress = job.progress != null ? job.progress.toFixed(1) : 0;
+    const state = job.state || "UNKNOWN";
+
+    document.getElementById("sparkBar").style.width = progress + "%";
+    document.getElementById("sparkBar").innerHTML = state + " (" + progress + "%)";
+
+    if (state === "FINISHED" || state === "FAILED" || state === "KILLED") {
+        clearInterval(sparkMonitorInterval);
+        if (state === "FINISHED") {
+            loadJobs();
+        }
+    }
+}
+
+async function startHadoopJob(){
+    document.getElementById("job1Bar").style.width = "100%";
+    document.getElementById("job1Bar").innerHTML = "Waiting for Job1 to start";
+
+    document.getElementById("job2Bar").style.width = "100%";
+    document.getElementById("job2Bar").innerHTML = "Waiting for Job2 to start";
+
+    document.getElementById("job3Bar").style.width = "100%";
+    document.getElementById("job3Bar").innerHTML = "Waiting for Job3 to start";
+    const response = await fetch(API_BASE + "/jobs/hadoop", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            dataset: document.getElementById("dataset").value,
+            job1Reducers: parseInt(document.getElementById("job1Reducers").value),
+            job2Reducers: parseInt(document.getElementById("job2Reducers").value),
+            job3Reducers: parseInt(document.getElementById("job3Reducers").value),
+            inputSplitSize: parseInt(document.getElementById("splitSize").value),
+            minReviewsPerfect: parseInt(document.getElementById("minReviews").value),
+            minHelpfulRatio: parseFloat(document.getElementById("minHelpful").value),
+            minVerifiedRatio: parseFloat(document.getElementById("minVerified").value)
+        })
+    });
+
+    const data = await response.json();
+    currentPipelineId = data.pipelineId;
+    startMonitoring();
+}
+
+function startMonitoring() {
+    if (monitorInterval) clearInterval(monitorInterval);
+    monitorInterval = setInterval(updatePipelineStatus, 2000);
+}
+
+async function updatePipelineStatus() {
+    if (!currentPipelineId) return;
+
+    const response = await fetch(API_BASE + "/jobs/hadoop/pipeline/" + currentPipelineId);
+    const data = await response.json();
+
+    if (data.status === "INITIALIZING" || !data.steps) return;
+
+    const j1 = data.steps.job1;
+    const j2 = data.steps.job2;
+    const j3 = data.steps.job3;
+
+    document.getElementById("job1Bar").style.width = j1.progress_percent + "%";
+    document.getElementById("job1Bar").innerHTML = "Job1 - " + j1.state + " (" + Math.round(j1.progress_percent) + "%)";
+
+    document.getElementById("job2Bar").style.width = j2.progress_percent + "%";
+    document.getElementById("job2Bar").innerHTML = "Job2 - " + j2.state + " (" + Math.round(j2.progress_percent) + "%)";
+
+    document.getElementById("job3Bar").style.width = j3.progress_percent + "%";
+    document.getElementById("job3Bar").innerHTML = "Job3 - " + j3.state + " (" + Math.round(j3.progress_percent) + "%)";
+
+    if (j1.state === "FINISHED" && j2.state === "FINISHED" && j3.state === "FINISHED") {
+        clearInterval(monitorInterval);
+        loadJobs();
+    }
+}
+
+const PAGE_SIZE = 20;
+let allJobsCache = [];
+
+async function loadJobs() {
+    allJobsCache = [];
+    try {
+        const respHadoop = await fetch(API_BASE + "/jobs/hadoop");
+        const hadoopJobs = await respHadoop.json();
+        if (Array.isArray(hadoopJobs)) {
+            hadoopJobs.forEach(job => allJobsCache.push({ ...job, _type: "HADOOP" }));
+        }
+
+        const respSpark = await fetch(API_BASE + "/jobs/spark");
+        const sparkJobs = await respSpark.json();
+        if (Array.isArray(sparkJobs)) {
+            sparkJobs.forEach(job => allJobsCache.push({ ...job, _type: "SPARK" }));
+        }
+    } catch(err) { 
+        console.log("Error loading jobs:", err); 
+    }
+
+    allJobsCache.sort((a, b) => (b.startedTime || 0) - (a.startedTime || 0));
+    renderJobRows(PAGE_SIZE);
+}
+
+function renderJobRows(limit) {
+    const table = document.getElementById("jobsTable");
+    table.innerHTML = "";
+
+    const visible   = allJobsCache.slice(0, limit);
+    const remaining = allJobsCache.length - visible.length;
+
+    visible.forEach(job => {
+        const startedAt = job.startedTime ? new Date(job.startedTime).toLocaleString() : "–";
+        
+        let badgeColor = "bg-secondary";
+        if(job.state === "FINISHED") badgeColor = "bg-success";
+        else if (job.state === "RUNNING") badgeColor = "bg-primary";
+        else if (job.state === "FAILED") badgeColor = "bg-danger";
+
+        let typeIcon = job._type === "SPARK" ? "<i class='fa-solid fa-bolt text-warning me-1'></i>" : "<i class='fa-solid fa-server text-primary me-1'></i>";
+
+        table.innerHTML += `
+            <tr class="job-row" onclick="openJobDetail('${job.id}', '${job._type.toLowerCase()}', '${job.state}')">
+                <td class="ps-4"><code style="font-size:0.8rem; background: #EDF2F7; padding: 4px 8px; border-radius: 6px; color: #4A5568;">${job.id}</code></td>
+                <td class="fw-bold">${job.name}</td>
+                <td><span class="badge ${badgeColor}">${job.state}</span></td>
+                <td>${typeIcon} <span class="fw-bold" style="font-size:0.85rem">${job._type}</span></td>
+                <td style="font-size:0.85rem;color:#64748b"><i class="fa-regular fa-clock me-1"></i> ${startedAt}</td>
+            </tr>`;
+    });
+
+    if (remaining > 0) {
+        table.innerHTML += `
+            <tr>
+                <td colspan="5" class="text-center py-3">
+                    <button class="btn btn-sm btn-secondary rounded-pill px-4"
+                        onclick="event.stopPropagation(); renderJobRows(${limit + PAGE_SIZE})">
+                        ↓ Load More (${remaining} remaining)
+                    </button>
+                </td>
+            </tr>`;
+    }
+}
+
+// ── DETAIL MODAL ─────────────────────────────────────────
+let currentJobId   = null;
+let currentJobType = null;
+
+async function openJobDetail(jobId, jobType, jobState) {
+    currentJobId = jobId;
+    currentJobType = jobType;
+
+    document.getElementById("modalTitle").innerHTML = `<i class="fa-solid fa-chart-line me-2"></i> ${jobId}`;
+    document.getElementById("modalBody").innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3 text-muted fw-medium">Loading telemetry metrics...</p>
+        </div>`;
+    
+    // Hide buttons initially
+    document.getElementById("btnDownloadResultRanking").classList.add("d-none");
+    document.getElementById("btnDownloadResultAnomalies").classList.add("d-none");
+
+    const modal = new bootstrap.Modal(document.getElementById("detailModal"));
+    modal.show();
+
+    try {
+        const resp = await fetch(`${API_BASE}/jobs/${jobId}`);
+        const job  = await resp.json();
+        renderMetrics(job, jobType, jobState);
+
+        if (jobState === "FINISHED") {
+            if (jobType === "spark") {
+                document.getElementById("btnDownloadResultRanking").innerHTML = '<i class="fa-solid fa-download"></i> Download Ranking';
+                document.getElementById("btnDownloadResultRanking").classList.remove("d-none");
+                document.getElementById("btnDownloadResultAnomalies").classList.remove("d-none");
+            } else {
+                document.getElementById("btnDownloadResultRanking").innerHTML = '<i class="fa-solid fa-download"></i> Download';
+                document.getElementById("btnDownloadResultRanking").classList.remove("d-none");
+            }
+            await renderResult(jobId, jobType);
+        }
+    } catch(err) {
+        document.getElementById("modalBody").innerHTML =
+            `<div class="alert alert-danger shadow-sm rounded-3"><i class="fa-solid fa-circle-exclamation me-2"></i> Error loading details: ${err}</div>`;
+    }
+}
+
+function renderMetrics(job, jobType, jobState) {
+    const fmt     = v => (v != null ? v : "–");
+    const elapsed = job.elapsedTime   ? (job.elapsedTime / 1000).toFixed(1) + " s" : "–";
+    const memory  = job.allocatedMB && job.allocatedMB > 0 ? job.allocatedMB + " MB" : "–";
+    const vcores  = job.allocatedVCores && job.allocatedVCores > 0 ? job.allocatedVCores : "–";
+    const progress= job.progress != null ? job.progress.toFixed(1) + "%" : "–";
+
+    document.getElementById("modalBody").innerHTML = `
+        <h6 class="text-muted mb-3 fw-bold text-uppercase" style="font-size:0.8rem; letter-spacing:1px;">
+            <i class="fa-solid fa-gauge-high me-1"></i> Telemetry & Performance
+        </h6>
+        <div class="row g-3">
+            <div class="col-6 col-md-3"><div class="metric-card">
+                <div class="metric-label"><i class="fa-solid fa-traffic-light me-1"></i> State</div>
+                <div class="metric-value ${job.state === 'FINISHED' ? 'text-success' : 'text-primary'}">${fmt(job.state)}</div>
+            </div></div>
+            <div class="col-6 col-md-3"><div class="metric-card">
+                <div class="metric-label"><i class="fa-solid fa-flag-checkered me-1"></i> Final Status</div>
+                <div class="metric-value">${fmt(job.finalStatus)}</div>
+            </div></div>
+            <div class="col-6 col-md-3"><div class="metric-card">
+                <div class="metric-label"><i class="fa-solid fa-bars-progress me-1"></i> Progress</div>
+                <div class="metric-value">${progress}</div>
+            </div></div>
+            <div class="col-6 col-md-3"><div class="metric-card">
+                <div class="metric-label"><i class="fa-regular fa-clock me-1"></i> Elapsed</div>
+                <div class="metric-value">${elapsed}</div>
+            </div></div>
+            <div class="col-6 col-md-4"><div class="metric-card">
+                <div class="metric-label"><i class="fa-solid fa-memory me-1"></i> Memory Allocated</div>
+                <div class="metric-value">${memory}</div>
+            </div></div>
+            <div class="col-6 col-md-4"><div class="metric-card">
+                <div class="metric-label"><i class="fa-solid fa-microchip me-1"></i> vCores</div>
+                <div class="metric-value">${vcores}</div>
+            </div></div>
+            <div class="col-6 col-md-4"><div class="metric-card">
+                <div class="metric-label"><i class="fa-solid fa-layer-group me-1"></i> Queue</div>
+                <div class="metric-value">${fmt(job.queue)}</div>
+            </div></div>
+            <div class="col-12"><div class="metric-card">
+                <div class="metric-label"><i class="fa-solid fa-tags me-1"></i> Application Tags</div>
+                <div class="metric-value text-muted" style="font-size:0.85rem; font-family: monospace; word-break:break-all">${fmt(job.applicationTags)}</div>
+            </div></div>
+        </div>
+        <div id="resultSection"></div>`;
+}
+
+// ── TEXT FORMATTER (ALIGNS ### AND TABS) ─────────────────
+function formatOutputText(text) {
+    const lines = text.split('\n');
+    const previewLines = lines.slice(0, 50).filter(l => l.trim().length > 0);
+    
+    // Find max width for each column to properly pad spaces
+    const colWidths = [];
+    const parsedLines = previewLines.map(line => {
+        // Split by both tab (\t) and ### so the first column handles ID correctly
+        const parts = line.split(/\t|###/);
+        parts.forEach((p, i) => {
+            const trimmed = p.trim();
+            if (!colWidths[i]) colWidths[i] = 0;
+            if (trimmed.length > colWidths[i]) colWidths[i] = trimmed.length;
+        });
+        return parts.map(p => p.trim());
+    });
+
+    // Pad each column and assemble the neatly aligned lines
+    return parsedLines.map(parts => {
+        if (parts.length === 1) return parts[0]; 
+        return parts.map((p, i) => {
+            if (i === parts.length - 1) return p;
+            return p.padEnd(colWidths[i], ' ') + "   |   ";
+        }).join(''); 
+    }).join('\n');
+}
+
+async function renderResult(jobId, jobType) {
+    const section = document.getElementById("resultSection");
+
+    if (jobType === "spark") {
+        section.innerHTML = `
+            <hr class="my-4" style="border-color:#e2e8f0;">
+            <h6 class="text-muted mb-3 fw-bold text-uppercase" style="font-size:0.8rem; letter-spacing:1px;">
+                <i class="fa-solid fa-file-lines me-1"></i> Output
+            </h6>
+            <div class="d-flex flex-column gap-2 mb-3">
+                <button class="btn btn-dark shadow-sm py-2" onclick="loadSparkRanking('${jobId}')">
+                    <i class="fa-solid fa-list-ol me-1"></i> Show Ranking
+                </button>
+                <button class="btn btn-dark shadow-sm py-2" onclick="loadSparkAnomalies('${jobId}')">
+                    <i class="fa-solid fa-magnifying-glass-chart me-1"></i> Show Anomalies
+                </button>
+            </div>
+            <div id="sparkOutputSection"></div>
+        `;
+        return;
+    }
+
+    // Hadoop flow
+    section.innerHTML = `<hr class="my-4" style="border-color:#e2e8f0;">
+        <h6 class="text-muted mb-3 fw-bold text-uppercase" style="font-size:0.8rem; letter-spacing:1px;">
+            <i class="fa-solid fa-file-lines me-1"></i> Output Artifacts
+        </h6>
+        <div class="text-center py-4 bg-light rounded-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status"></div> 
+            <span class="ms-2 fw-medium text-muted">Retrieving blocks...</span>
+        </div>`;
+
+    try {
+        const url = `${API_BASE}/jobs/hadoop/${jobId}/result`;
+        const resp = await fetch(url);
+        if (!resp.ok) {
+            const err = await resp.json();
+            section.innerHTML = `<hr class="my-4"><div class="alert alert-warning shadow-sm rounded-3"><i class="fa-solid fa-triangle-exclamation me-2"></i> ${err.error || "Result not available."}</div>`;
+            return;
+        }
+
+        const text = await resp.text();
+        const lines = text.split("\n");
+        const truncated = lines.length > 50;
+        const preview = formatOutputText(text);
+
+        section.innerHTML = `
+            <hr class="my-4" style="border-color:#e2e8f0;">
+            <h6 class="text-muted mb-2 fw-bold text-uppercase d-flex justify-content-between align-items-center" style="font-size:0.8rem; letter-spacing:1px;">
+                <span><i class="fa-solid fa-terminal me-1"></i> StdOut Preview</span>
+                ${truncated ? "<span class='badge bg-secondary text-lowercase' style='letter-spacing:0'>Truncated to 50 lines</span>" : ""}
+            </h6>
+            <div class="terminal-header mt-3">
+                <div class="terminal-dot dot-red"></div>
+                <div class="terminal-dot dot-yellow"></div>
+                <div class="terminal-dot dot-green"></div>
+            </div>
+            <div class="result-box m-0">${escapeHtml(preview)}</div>`;
+    } catch(err) {
+        section.innerHTML = `<hr class="my-4"><div class="alert alert-danger shadow-sm rounded-3"><i class="fa-solid fa-circle-xmark me-2"></i> Failed to load result: ${err}</div>`;
+    }
+}
+
+async function loadSparkRanking(jobId) {
+    const outSection = document.getElementById("sparkOutputSection");
+    outSection.innerHTML = `
+        <div class="text-center py-4 mt-3 bg-light rounded-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status"></div> 
+            <span class="ms-2 fw-medium text-muted">Retrieving ranking...</span>
+        </div>`;
+    
+    try {
+        const resp = await fetch(`${API_BASE}/jobs/spark/${jobId}/result/ranking`);
+        if (!resp.ok) { 
+            const e = await resp.json(); 
+            outSection.innerHTML = `<div class="alert alert-warning mt-3">${e.error}</div>`; 
+            return; 
+        }
+        const text = await resp.text();
+        const lines = text.split("\n");
+        const truncated = lines.length > 50;
+        const preview = formatOutputText(text);
+
+        outSection.innerHTML = `
+            <h6 class="text-muted mt-4 mb-2 fw-bold text-uppercase d-flex justify-content-between align-items-center" style="font-size:0.8rem; letter-spacing:1px;">
+                <span><i class="fa-solid fa-terminal me-1"></i> Ranking Preview</span>
+                ${truncated ? "<span class='badge bg-secondary text-lowercase' style='letter-spacing:0'>Truncated to 50 lines</span>" : ""}
+            </h6>
+            <div class="terminal-header mt-2">
+                <div class="terminal-dot dot-red"></div>
+                <div class="terminal-dot dot-yellow"></div>
+                <div class="terminal-dot dot-green"></div>
+            </div>
+            <div class="result-box m-0 border-primary" style="border-width: 1px;">${escapeHtml(preview)}</div>`;
+    } catch(err) { 
+        outSection.innerHTML = `<div class="alert alert-danger mt-3">Failed: ${err}</div>`; 
+    }
+}
+
+async function loadSparkAnomalies(jobId) {
+    const outSection = document.getElementById("sparkOutputSection");
+    outSection.innerHTML = `
+        <div class="text-center py-4 mt-3 bg-light rounded-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status"></div> 
+            <span class="ms-2 fw-medium text-muted">Retrieving anomalies...</span>
+        </div>`;
+        
+    try {
+        const resp = await fetch(`${API_BASE}/jobs/spark/${jobId}/result/anomalies`);
+        if (!resp.ok) { 
+            const e = await resp.json(); 
+            outSection.innerHTML = `<div class="alert alert-warning mt-3">${e.error}</div>`; 
+            return; 
+        }
+        const text    = await resp.text();
+        const lines = text.split("\n");
+        const truncated = lines.length > 50;
+        const preview = formatOutputText(text);
+        
+        outSection.innerHTML = `
+            <h6 class="text-muted mt-4 mb-2 fw-bold text-uppercase d-flex justify-content-between align-items-center" style="font-size:0.8rem; letter-spacing:1px;">
+                <span><i class="fa-solid fa-triangle-exclamation text-warning me-1"></i> Anomalies Detected</span>
+                ${truncated ? "<span class='badge bg-secondary text-lowercase' style='letter-spacing:0'>Truncated to 50 lines</span>" : ""}
+            </h6>
+            <div class="terminal-header mt-2">
+                <div class="terminal-dot dot-red"></div>
+                <div class="terminal-dot dot-yellow"></div>
+                <div class="terminal-dot dot-green"></div>
+            </div>
+            <div class="result-box m-0 border-warning" style="border-width: 1px;">${escapeHtml(preview)}</div>`;
+    } catch(err) { 
+        outSection.innerHTML = `<div class="alert alert-danger mt-3">Failed: ${err}</div>`; 
+    }
+}
+
+async function downloadResult(sparkResultType) {
+    if (!currentJobId || !currentJobType) return;
+    const url = currentJobType === "spark"
+        ? `${API_BASE}/jobs/spark/${currentJobId}/result/${sparkResultType}`
+        : `${API_BASE}/jobs/hadoop/${currentJobId}/result`;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `result_${currentJobId}.txt`;
+    a.click();
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+loadJobs();
+
+</script>
+</body>
+</html>
