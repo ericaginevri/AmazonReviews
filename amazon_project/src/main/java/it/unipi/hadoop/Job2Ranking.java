@@ -6,8 +6,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.WritableComparable;
-import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Partitioner;
@@ -19,7 +17,6 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import it.unipi.hadoop.writables.CategoryScoreKey;
-
 public class Job2Ranking
 {
     public static class RankingMapper extends Mapper<LongWritable, Text, CategoryScoreKey, Text>
@@ -66,30 +63,21 @@ public class Job2Ranking
         }
     }
 
-    public static class CategoryGroupingComparator extends WritableComparator
-    {
-        public CategoryGroupingComparator() {
-            super(CategoryScoreKey.class, true);
-        }
-
-        @Override
-        public int compare(WritableComparable a, WritableComparable b) {
-            CategoryScoreKey keyA = (CategoryScoreKey) a;
-            CategoryScoreKey keyB = (CategoryScoreKey) b;
-            return keyA.getCategory().compareTo(keyB.getCategory());
-        }
-    }
-
     public static class RankingReducer extends Reducer<CategoryScoreKey, Text, Text, Text>
     {
         private final Text outputKey = new Text();
         private final Text outputValue = new Text();
 
+        private String currentCategory = "";
+        private int rank = 0;
+
         @Override
         public void reduce(CategoryScoreKey key, Iterable<Text> values, Context context) throws IOException, InterruptedException
         {
-            int rank = 1; // locale, non di istanza
-            String currentCategory = key.getCategory();
+            if (!key.getCategory().equals(currentCategory)) {
+                currentCategory = key.getCategory();
+                rank = 1;
+            }
 
             for (Text val : values) {
                 String[] fields = val.toString().split("###");
@@ -125,8 +113,7 @@ public class Job2Ranking
         Job job = Job.getInstance(conf, "Job2Ranking");
         job.setJarByClass(Job2Ranking.class);
         job.setMapperClass(RankingMapper.class);
-        job.setPartitionerClass(CategoryPartitioner.class); 
-        job.setGroupingComparatorClass(CategoryGroupingComparator.class);
+        job.setPartitionerClass(CategoryPartitioner.class);
         job.setReducerClass(RankingReducer.class);
         
         int reducers = Integer.parseInt(otherArgs[2]);
