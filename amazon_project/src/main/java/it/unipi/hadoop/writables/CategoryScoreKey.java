@@ -1,8 +1,9 @@
-package it.unipi.hadoop;
+package it.unipi.hadoop.writables;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
 import org.apache.hadoop.io.WritableComparable;
 
 public class CategoryScoreKey implements  WritableComparable<CategoryScoreKey>{
@@ -25,6 +26,7 @@ public class CategoryScoreKey implements  WritableComparable<CategoryScoreKey>{
     public String getCategory() { return this.category; }
     public double getScore() { return this.score; }
 
+    @Override
     public void readFields(DataInput in) throws IOException
     {
         this.category = in.readUTF();
