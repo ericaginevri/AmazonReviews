@@ -68,7 +68,7 @@ public class Job2Ranking
 
     public static class CategoryGroupingComparator extends WritableComparator
     {
-        protected CategoryGroupingComparator() {
+        public CategoryGroupingComparator() {
             super(CategoryScoreKey.class, true);
         }
 
