@@ -43,5 +43,4 @@ docker build -t rest-server .
 ```bash
 docker run -p 8080:8080 rest-server
 ```
-6. Access the Application: once the server is running, you can interact with the REST API by navigating to the following URL in your web browser:
-[http://10.1.1.124:8080]
+6. Access the Application: once the server is running, you can interact with the REST API by navigating to the following URL in your web browser: http://10.1.1.124:8080
