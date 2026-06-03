@@ -29,10 +29,10 @@ public class Job2Ranking
         {
             String line = value.toString();
 
-            if (line == null || line.length() == 0)
+            if (line == null || line.length() == 0) //salto eventuali righe vuote
                 return;
 
-            //extract the fields from output of Job1
+            //estraggo i fields dall'output del Job1
             String[] fields = line.split("\t");
             String productParent = fields[0];
             String[] data = fields[1].split("###");
@@ -44,11 +44,11 @@ public class Job2Ranking
             int helpfulVotes = Integer.parseInt(data[5]);
             int totalVotes = Integer.parseInt(data[6]);
 
-            //compute the score
+            //calcolo lo score
             double score = avgRating*Math.log(1+reviewCount)*(1+((double)helpfulVotes/(1+totalVotes)));
 
             outputKey.set(category, score);
-            outputValue.set( productParent + "###" + productTitle + "###" + score);
+            outputValue.set(productParent + "###" + productTitle + "###" + score);
 
             context.write(outputKey, outputValue);
         }
@@ -59,6 +59,7 @@ public class Job2Ranking
         @Override
         public int getPartition(CategoryScoreKey key, Text value, int numPartitions)
         {
+            //uso come chiave per fare la partizione solo la categoria
             return Math.abs(key.getCategory().hashCode()) % numPartitions;
         }
     }
@@ -74,6 +75,8 @@ public class Job2Ranking
         @Override
         public void reduce(CategoryScoreKey key, Iterable<Text> values, Context context) throws IOException, InterruptedException
         {
+            //se la categoria è diversa (sono finiti i prodotti di una categoria e arriva la nuova categoria)
+            //allora risetto la variabile rank e la variabile categoria
             if (!key.getCategory().equals(currentCategory)) {
                 currentCategory = key.getCategory();
                 rank = 1;
@@ -91,6 +94,7 @@ public class Job2Ranking
 
                 context.write(outputKey, outputValue);
 
+                //rank++ per il prossimo prodotto del ranking
                 rank++;
             }
         }

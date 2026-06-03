@@ -34,14 +34,16 @@ public class Job3Anomaly
             String productParent = fields[0];
             String[] data = fields[1].split("###");
 
+            //se la lunghezza del campo data è 7 vuol dire che stiamo guardando l'output del job1
             if (data.length == 7){
                 outputKey.set(productParent);
-                outputValue.set("JOB1###" + fields[1]);
+                outputValue.set("JOB1###" + fields[1]); //attacchiamo l'etichetta JOB1 al record
                 context.write(outputKey, outputValue);
             } 
+            //se è 4 stiamo guardando quello del job 2
             else if (data.length == 4){
                 outputKey.set(productParent);
-                outputValue.set("JOB2###" + fields[1]);
+                outputValue.set("JOB2###" + fields[1]); //attacchiamo l'etichetta JOB2 al record
                 context.write(outputKey, outputValue);
             }
         }
@@ -61,6 +63,8 @@ public class Job3Anomaly
         @Override
         public void setup(Context context)
         {
+            //recupero i parametri (soglie) che possono essere settati dall'utente 
+            //se non sono settati dall'utente ci sono dei valori di default
             Configuration conf = context.getConfiguration();
             minReviewsPerfect = conf.getInt("min.reviews.perfect", 100);
             minHelpfulRatio = conf.getDouble("min.helpful.ratio", 0.2);
@@ -104,6 +108,7 @@ public class Job3Anomaly
             double helpfulRatio = (double) helpfulVotes/(1+totalVotes);
             double verifiedRatio = (double) verifiedCount/reviewCount;
 
+            //calcolo le anomalie
             if (score > 20 && helpfulRatio < minHelpfulRatio){
                 helpfulAnomalies++;
                 outputValue.set("HELPFUL_RATIO_ANOMALY" + "###" + productTitle + "###" + category + "###" + score);
@@ -132,6 +137,7 @@ public class Job3Anomaly
         @Override
         public void cleanup(Context context) throws IOException, InterruptedException
         {
+            //summary per ogni reducer 
             context.write(new Text("[REDUCER_SUMMARY]"), new Text("PerfectProducts=" + perfectProducts + " HelpfulRatioAnomalies=" + helpfulAnomalies + " VerifiedRatioAnomalies=" + verifiedAnomalies + " RankAnomalies=" + rankAnomalies));
         }
     }

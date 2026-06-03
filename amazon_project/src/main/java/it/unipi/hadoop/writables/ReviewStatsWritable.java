@@ -8,14 +8,14 @@ import org.apache.hadoop.io.Writable;
 public class ReviewStatsWritable implements Writable
 {
     private int reviewCount;
-    private double ratingSum;  //double
+    private double ratingSum;  
     private int verifiedCount;
     private int helpfulVotes;
     private int totalVotes;
     private String category;
     private String productTitle;
 
-    public ReviewStatsWritable() {} //costruttore vuoto
+    public ReviewStatsWritable() {} //costruttore vuoto richiesto da Hadoop durante la deserializzazione
 
     public ReviewStatsWritable(int reviewCount, double ratingSum, int verifiedCount, int helpfulVotes, int totalVotes, String category, String productTitle)
     {
@@ -28,6 +28,7 @@ public class ReviewStatsWritable implements Writable
         this.productTitle = productTitle;
     }
 
+    //getter
     public int getReviewCount() { return reviewCount; }
     public double getRatingSum() { return ratingSum; }
     public int getVerifiedCount() { return verifiedCount; }
@@ -36,6 +37,7 @@ public class ReviewStatsWritable implements Writable
     public String getCategory() { return category; }
     public String getProductTitle() { return productTitle; }
 
+    //setter dei singoli campi 
     public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
     public void setRatingSum(double ratingSum) { this.ratingSum = ratingSum; }
     public void setVerifiedCount(int verifiedCount) { this.verifiedCount = verifiedCount; }
@@ -44,6 +46,7 @@ public class ReviewStatsWritable implements Writable
     public void setCategory(String category) { this.category = category; }
     public void setProductTitle(String productTitle) { this.productTitle = productTitle; }
 
+    //setter per l'inter oggetto ReviewStatsWritable
     public void set(int reviewCount, double ratingSum, int verifiedCount, int helpfulVotes, int totalVotes, String category, String productTitle)
     {
         this.reviewCount = reviewCount;
@@ -55,6 +58,7 @@ public class ReviewStatsWritable implements Writable
         this.productTitle = productTitle;
     }
 
+    //deserializzare l'oggetto 
     @Override
     public void readFields(DataInput in) throws IOException{
         reviewCount = in.readInt();
@@ -66,6 +70,7 @@ public class ReviewStatsWritable implements Writable
         productTitle = in.readUTF();
     }
 
+    //serializzare l'oggetto
     @Override
     public void write(DataOutput out) throws IOException{
         out.writeInt(reviewCount);
@@ -77,6 +82,7 @@ public class ReviewStatsWritable implements Writable
         out.writeUTF(productTitle);
     }
 
+    //conversione in stringa
     @Override
     public String toString() {
         return productTitle + "," +

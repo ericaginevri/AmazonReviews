@@ -22,7 +22,6 @@ public class Job1Aggregation
     public static class ReviewMapper extends Mapper<LongWritable, Text, Text, ReviewStatsWritable>
     {
         private final Text outputKey = new Text();
-
         private final ReviewStatsWritable outputValue = new ReviewStatsWritable();
 
         @Override
@@ -33,7 +32,7 @@ public class Job1Aggregation
             if (line == null || line.length() == 0)
                 return;
 
-            String[] fields = line.split("\t"); //split with \t since the file is a .tsv file
+            String[] fields = line.split("\t"); //split con \t dato che il file è in formato .tsv 
 
             if (fields[0].equals("customer_id")) //skip header
                 return;
@@ -48,14 +47,14 @@ public class Job1Aggregation
                 double rating = Double.parseDouble(fields[5]);
                 int helpfulVotes = Integer.parseInt(fields[6]);
                 int totalVotes = Integer.parseInt(fields[7]);
-                int verified = fields[8].equals("Y") ? 1 : 0; //we will use it for anomaly detection 
+                int verified = fields[8].equals("Y") ? 1 : 0; //lo useremo per fare nomaly detection 
 
                 outputKey.set(productParent);
                 outputValue.set(1, rating, verified, helpfulVotes, totalVotes, category, productTitle);
 
                 context.write(outputKey, outputValue);
             } catch(Exception e) {
-                //skip malformed lines
+                //skip linee malformate
             }
         }
     }
@@ -116,7 +115,7 @@ public class Job1Aggregation
                 productTitle = val.getProductTitle();
             }
 
-            double avgRating = ratingSum / reviewCount;
+            double avgRating = ratingSum / reviewCount;  //compute avg Rating
 
             outputValue.set(productTitle + "###" + category + "###" + reviewCount + "###" + avgRating + "###" + verifiedCount + "###" + helpfulVotes + "###" + totalVotes); //we use ### to split the output since commas appear in the product_title 
 
