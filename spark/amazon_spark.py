@@ -1,8 +1,8 @@
-import sys
-import math
-from pyspark import SparkConf, SparkContext
+import sys #read arguments from command line
+import math #used for log in the score
+from pyspark import SparkConf, SparkContext 
 
-#split lines, extract fields and parse 
+#split lines, extract fields and parse - equivalent to job 1 mapper
 def parse_line(line):
     fields = line.split("\t")
     
@@ -18,7 +18,7 @@ def parse_line(line):
     return (parent, (title, category, 1, rating, verified, helpful, total))
 
 
-#reduce - calcolo metriche job1
+#equivalent to combiner and reducer of job1  
 def aggregate_metrics(v1, v2):
     return (
         v1[0],             #title
@@ -31,22 +31,22 @@ def aggregate_metrics(v1, v2):
     )
 
 
-#mapper job2
+#equivalent to mapper of job2
 def compute_score_and_prepare_ranking(data):
-    parent, metrics = data
+    parent, metrics = data   #metrics = aggregated data from job 1
     title, category, count, sum_rating, sum_ver, sum_help, sum_tot = metrics
     
     avg_rating = sum_rating / count 
-    score = avg_rating * math.log10(1 + count) * (1 + (sum_help / (1 + sum_tot)))
+    score = avg_rating * math.log(1 + count) * (1 + (sum_help / (1 + sum_tot)))
     
-    #new key
+    #new key - category 
     return (category, (score, parent, title, count, avg_rating, sum_ver, sum_help, sum_tot))
 
 
-#reducer job2 
+#equivalent to reducer of job2 
 def apply_ranking(category_data):
-    category, products = category_data
-    sorted_products = sorted(products, key=lambda x: x[0], reverse=True) # sort
+    category, products = category_data  #products contains products of the same category
+    sorted_products = sorted(products, key=lambda x: x[0], reverse=True) #sort by descending order
     
     results = []
     rank = 1
@@ -58,7 +58,8 @@ def apply_ranking(category_data):
     return results
 
 
-#mapper job3
+#equivalent to reducer of job3
+#receives the product with the information + score/ranking
 def detect_anomalies(data, min_reviews_perfect, min_helpful_ratio, min_verified_ratio):
     parent, metrics = data
     title, category, score, rank, count, avg_rating, ver, help, tot = metrics 
@@ -75,7 +76,7 @@ def detect_anomalies(data, min_reviews_perfect, min_helpful_ratio, min_verified_
     if verified_ratio < min_verified_ratio and count > min_reviews_perfect:
         anomalies.append(f"{parent}\tVERIFIED_RATIO_ANOMALY###{title}###{category}###{score}")
         
-    if avg_rating == 4.9 and count > min_reviews_perfect:
+    if avg_rating > 4.9 and count > min_reviews_perfect:
         anomalies.append(f"{parent}\tSUSPICIOUS_PERFECT_PRODUCT###{title}###{category}###{score}")
         
     if rank <= 10 and avg_rating < 3.5:
@@ -84,6 +85,7 @@ def detect_anomalies(data, min_reviews_perfect, min_helpful_ratio, min_verified_
     return anomalies
 
 
+#save the ranking output in textual format - similar output to Hadoop jobs
 def format_ranking_output(data):
     parent, metrics = data
     title, category, score, rank = metrics[0:4]
@@ -95,8 +97,8 @@ if __name__ == "__main__":
         print("Correct use: spark-submit amazon_spark.py <input_dataset> <output_ranking> <output_anomalies> <min_reviews_perfect> <min_helpful_ratio> <min_verified_ratio>")
         sys.exit(-1)
 
-    conf = SparkConf().setAppName("AmazonAnalytics_Spark")
-    sc = SparkContext(conf=conf)
+    conf = SparkConf().setAppName("AmazonAnalytics_Spark") 
+    sc = SparkContext(conf=conf) 
 
     input_path = sys.argv[1]
     out_ranking = sys.argv[2]
@@ -105,14 +107,15 @@ if __name__ == "__main__":
     min_helpful_ratio = float(sys.argv[5])
     min_verified_ratio = float(sys.argv[6])
 
-    raw_rdd = sc.textFile(input_path)
+    raw_rdd = sc.textFile(input_path) #textFile() = transform the text file in RDD
     
+    #remove header and malformed lines
     header = raw_rdd.first() 
     clean_rdd = raw_rdd.filter(lambda line: line != header and len(line.split("\t")) >= 9)
 
     aggregated_rdd = clean_rdd.map(parse_line).reduceByKey(aggregate_metrics)
     ranked_rdd = aggregated_rdd.map(compute_score_and_prepare_ranking).groupByKey().flatMap(apply_ranking)
-    ranked_rdd.cache()
+    ranked_rdd.cache() #persist RDD memory only
 
     ranked_rdd.map(format_ranking_output).saveAsTextFile(out_ranking)
 
