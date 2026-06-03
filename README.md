@@ -18,7 +18,7 @@ The layout is divided between the `root` and `hadoop` user environments:
 * The `root` user directory (accessible via `ssh root@10.1.1.124` and password `ubuntu`) contains:
   * `amazon-rest/`: which contains all the files and components for both the REST server and the REST client.
 
-* The `hadoop` user directory (accessible via `sudo su -- hadoop` and password `miranda`) contains:
+* The `hadoop` user directory (accessible via `sudo su -- hadoop` and password `miranda`) contains, after done `cd` command:
   * `amazon_project/`: which is the main directory containing the components as follow:
     * `spark/`: contains amazon_spark.py
     * `amazon_project/`: contains all Hadoop-related files
