@@ -22,7 +22,7 @@ The layout is divided between the `root` and `hadoop` user environments:
   * `amazon_project/`: which is the main directory containing the components as follow:
     * `spark/`: contains amazon_spark.py
     * `amazon_project/`: contains all Hadoop-related files
-    * `python_parallel_execution.py`: a Python script for managing Hadoop parallel execution
+    * `non_parallel_execution.py`: a Python script for managing Hadoop parallel execution
 
 
 ## 🚀 Getting Started
