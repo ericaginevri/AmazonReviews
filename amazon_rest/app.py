@@ -453,31 +453,41 @@ def get_spark_job_result(job_id, output_type):
     
     # Spark file output name = part-00000
     target_folder = f"{job_tag}_{output_type}"
-    webhdfs_url = f"http://{hostname}:9870/webhdfs/v1/user/hadoop/{target_folder}/part-00000?op=OPEN"
-    
-    try:
-        response_namenode = requests.get(webhdfs_url, allow_redirects=False, timeout=10)
-        
-        if response_namenode.status_code == 307:
-            redirect_url = response_namenode.headers['Location']
-            
-            correct_redirect_url = redirect_url.replace('hadoop-datanode-3', '10.1.1.143')
-            correct_redirect_url = correct_redirect_url.replace('hadoop-datanode-2', '10.1.1.111')
-            correct_redirect_url = correct_redirect_url.replace('hadoop-namenode', '10.1.1.124')
-            
-            final_response = requests.get(correct_redirect_url, stream=True, timeout=30)
-            final_response.raise_for_status()
+    all_content = b""
 
-            return Response(
-                final_response.content,
-                content_type=final_response.headers.get('Content-Type', 'application/octet-stream'),
-                headers={"Content-Disposition": f"attachment; filename={output_type}_{job_id}.txt"}
-            )
-        else:
-            return jsonify({'error': 'Redirect of WebHDFS failed or file part-00000 not found.'}), 500
+    # Itera su tutti i part file (part-00000, part-00001, ...)
+    for i in range(10):
+        part_name = f"part-{str(i).zfill(5)}"
+        webhdfs_url = f"http://{hostname}:9870/webhdfs/v1/user/hadoop/{target_folder}/{part_name}?op=OPEN"
+        
+        try:
+            response_namenode = requests.get(webhdfs_url, allow_redirects=False, timeout=10)
             
-    except requests.exceptions.RequestException as e:
-        return jsonify({'error': f'Connection failed: {e}'}), 500
+            if response_namenode.status_code == 307:
+                redirect_url = response_namenode.headers['Location']
+                
+                correct_redirect_url = redirect_url.replace('hadoop-datanode-3', '10.1.1.143')
+                correct_redirect_url = correct_redirect_url.replace('hadoop-datanode-2', '10.1.1.111')
+                correct_redirect_url = correct_redirect_url.replace('hadoop-namenode', '10.1.1.124')
+                
+                final_response = requests.get(correct_redirect_url, stream=True, timeout=30)
+                final_response.raise_for_status()
+                all_content += final_response.content
+
+            elif response_namenode.status_code == 404:
+                break  # non ci sono altri part file
+
+        except requests.exceptions.RequestException:
+            break
+
+    if not all_content:
+        return jsonify({'error': 'No result files found'}), 404
+
+    return Response(
+        all_content,
+        content_type='text/plain',
+        headers={"Content-Disposition": f"attachment; filename={output_type}_{job_id}.txt"}
+    )
 
 # html page
 @app.route('/')
