@@ -29,7 +29,6 @@
             padding-bottom: 3rem;
         }
 
-        /* Hero Header */
         .dashboard-header {
             background: linear-gradient(135deg, #11047A 0%, var(--brand-primary) 100%);
             border-radius: 20px;
@@ -52,7 +51,6 @@
             border-radius: 50%;
         }
 
-        /* Cards */
         .card {
             background: var(--card-bg);
             border: none;
@@ -78,7 +76,6 @@
             padding: 1.5rem;
         }
 
-        /* Typography & Forms */
         .section-title {
             font-size: 0.85rem;
             font-weight: 700;
@@ -121,7 +118,6 @@
             background-color: #ffffff;
         }
 
-        /* Buttons */
         .btn {
             border-radius: 12px;
             font-weight: 600;
@@ -165,7 +161,6 @@
             color: var(--brand-primary);
         }
 
-        /* Progress Bars */
         .progress {
             height: 24px;
             border-radius: 12px;
@@ -185,7 +180,6 @@
         #job2Bar { background-color: var(--success-color); }
         #job3Bar { background-color: var(--warning-color); color: #4A5568;}
 
-        /* Tables */
         .table {
             vertical-align: middle;
         }
@@ -215,7 +209,6 @@
             border-left: 3px solid var(--brand-primary);
         }
 
-        /* Modal specific styling */
         .modal-content {
             border-radius: 20px;
             border: none;
@@ -256,7 +249,6 @@
             color: var(--text-main);
         }
 
-        /* Terminal Window for Output */
         .terminal-header {
             background: #2D3748;
             padding: 8px 16px;
@@ -305,10 +297,10 @@
                     <div class="mb-4">
                         <label class="form-label"><i class="fa-solid fa-database text-muted me-1"></i> Input Dataset</label>
                         <select id="dataset" class="form-select">
-                            <option value="amazon_reviews_250mb.tsv" selected>amazon_reviews_250mb</option> 
-                            <option value="amazon_reviews_500mb.tsv">amazon_reviews_500mb</option> 
-                            <option value="amazon_reviews_750mb.tsv">amazon_reviews_750mb</option> 
-                            <option value="amazon_reviews.tsv">amazon_reviews_complete</option> 
+                            <option value="amazon_reviews_250mb.tsv" selected> 250 MB</option> 
+                            <option value="amazon_reviews_500mb.tsv"> 500 MB</option> 
+                            <option value="amazon_reviews_750mb.tsv"> 750 MB</option> 
+                            <option value="amazon_reviews.tsv"> COMPLETE</option> 
                         </select>
                     </div>
 
@@ -401,10 +393,10 @@
                     <div class="mb-4">
                         <label class="form-label"><i class="fa-solid fa-database text-muted me-1"></i> Input Dataset</label>
                         <select id="sparkDataset" class="form-select">
-                            <option value="amazon_reviews_250mb.tsv" selected>amazon_reviews_250mb</option>
-                            <option value="amazon_reviews_500mb.tsv">amazon_reviews_500mb</option>
-                            <option value="amazon_reviews_750mb.tsv">amazon_reviews_750mb</option>
-                            <option value="amazon_reviews.tsv">amazon_reviews_complete</option>
+                            <option value="amazon_reviews_250mb.tsv" selected> 250 MB</option>
+                            <option value="amazon_reviews_500mb.tsv"> 500 MB</option>
+                            <option value="amazon_reviews_750mb.tsv"> 750 MB</option>
+                            <option value="amazon_reviews.tsv"> COMPLETE</option>
                         </select>
                     </div>
 
@@ -680,7 +672,6 @@ function renderJobRows(limit) {
     }
 }
 
-// ── DETAIL MODAL ─────────────────────────────────────────
 let currentJobId   = null;
 let currentJobType = null;
 
@@ -695,7 +686,6 @@ async function openJobDetail(jobId, jobType, jobState) {
             <p class="mt-3 text-muted fw-medium">Loading telemetry metrics...</p>
         </div>`;
     
-    // Hide buttons initially
     document.getElementById("btnDownloadResultRanking").classList.add("d-none");
     document.getElementById("btnDownloadResultAnomalies").classList.add("d-none");
 

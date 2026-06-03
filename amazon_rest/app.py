@@ -5,55 +5,53 @@ import paramiko
 import os
 import requests
 
-app = Flask(__name__)
+app = Flask(__name__) 
 
-# Global variables for authentication
+#global variables for authentication used by REST server to connect to the cluster
 hostname = "10.1.1.124"
 username = "hadoop"
 password = os.getenv("HADOOP_PASSWORD")
 
-# Hadoop
+#Hadoop
 
-# Jobs info
+#jobs info
 jar_name = "amazon_project-1.0-SNAPSHOT.jar"
 job1_name = "Job1Aggregation"
 job2_name = "Job2Ranking"
 job3_name = "Job3Anomaly"
 
+#this function executes a command on the Hadoop cluster using SSH
 def execute_ssh_command(hostname, username, password, command):
-    # Initialize SSH client
+    #initialize SSH client
     ssh = paramiko.SSHClient()
-    # Automatically accept unknown host keys (for development/examples only)
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     
-    # Connection to remote server
+    #connection to remote server
     ssh.connect(hostname=hostname, username=username, password=password, timeout=15)
     
-    # Execution of command
+    #execution of command
     ssh.exec_command(command)
     ssh.close()
 
+#function to find the job using its tag
 def get_job_by_tag(tag):
-    # Query to find the job using its tag
     url = f"http://{hostname}:8088/ws/v1/cluster/apps"
     
-    # Parameters of query string (equivalent to ?applicationTags=<tag>)
-    parameters = {
-        "applicationTags": tag
-    }
+    #parameters of query string (equivalent to ?applicationTags=<tag>)
+    parameters = { "applicationTags": tag }
 
     try:
-        response = requests.get(url, params=parameters, timeout=10) # execute the request with the url and parameters
-        response.raise_for_status() # if status not 200, throw an exception
-        response_as_json = response.json() # take response as json
+        response = requests.get(url, params=parameters, timeout=10) 
+        response.raise_for_status() #if status not 200, throw an exception
+        response_as_json = response.json()
         
-        # list of jobs is returned as an object with schema { apps : { app : [<jobs>] }} 
-        # to take a job we need to take apps, then app and then the first element (because tag is unique)
-        apps_container = response_as_json.get("apps") # return None if not exists
+        #list of jobs is returned as an object with schema { apps : { app : [<jobs>] }} 
+        #to take a job we need to take apps, then app and then the first element (because tag is unique)
+        apps_container = response_as_json.get("apps")
         
-        if apps_container and apps_container.get("app"): # if both not None
-            app_list = apps_container.get("app") # get the list of jobs
-            app = app_list[0] # take the first
+        if apps_container and apps_container.get("app"): 
+            app_list = apps_container.get("app") #get the list of jobs
+            app = app_list[0]
             return app
         else:
             return None
@@ -62,12 +60,12 @@ def get_job_by_tag(tag):
         print(f"Temporary error of connection to YARN: {e}")
 
 
-# POST Endpoint to start a pipeline of jobs in Hadoop
+#POST Endpoint to start a pipeline of jobs in Hadoop
 @app.route('/jobs/hadoop', methods=['POST'])
 def create_job():
-    data = request.get_json() or {}
+    data = request.get_json() or {} 
 
-    # Input dataset
+    #input dataset
     dataset = data.get('dataset')
 
     if not dataset:
@@ -76,25 +74,24 @@ def create_job():
             "message": "Dataset is required"
         }), 400
 
-    # Job1 parameters
+    #Job1 parameters
     job1_reducers = data.get('job1Reducers', 3)
     input_split_size = data.get('inputSplitSize', 134217728)
-    # Job2 parameters
+    #Job2 parameters
     job2_reducers = data.get('job2Reducers', 3)
-    # Job3 parameters
+    #Job3 parameters
     job3_reducers = data.get('job3Reducers', 3)
     min_reviews_perfect = data.get('minReviewsPerfect', 100)
     min_helpful_ratio = data.get('minHelpfulRatio', 0.2)
     min_verified_ratio = data.get('minVerifiedRatio', 0.5)
 
-    # Pipeline unique identifier
     pipeline_id = str(uuid.uuid4())
 
-    # Intermediate outputs
     job1_tag = f"{pipeline_id}_job1"
     job2_tag = f"{pipeline_id}_job2"
     job3_tag = f"{pipeline_id}_job3"
 
+    #sequence of the three commands 
     inner = (
         #JOB 1 
         f"cd amazon_project/amazon_project/target && "
@@ -116,7 +113,6 @@ def create_job():
         f"{job3_reducers} {min_reviews_perfect} {min_helpful_ratio} {min_verified_ratio}"
     )
 
-    # Redirect input to /dev/null so to avoid program waiting for ever for an input
     command = f"nohup sh -c '{inner}' > /home/hadoop/pipeline_{pipeline_id}.log 2>&1 < /dev/null &"
 
     execute_ssh_command(hostname, username, password, command)
@@ -146,7 +142,7 @@ def create_job():
     }), 500 
 
 
-# GET Endpoint to track progression of pipeline in Hadoop
+#GET Endpoint to track progression of pipeline in Hadoop
 @app.route('/jobs/hadoop/pipeline/<pipeline_id>', methods=['GET'])
 def get_pipeline(pipeline_id):
     try:
@@ -160,28 +156,28 @@ def get_pipeline(pipeline_id):
                 "status": "INITIALIZING"
             }), 200
         
-        # JOB 1
-        p1 = 0.0
-        state1 = "PENDING"
+        #Job1
+        p1 = 0.0 
+        state1 = "PENDING" 
         if job1_data:
             p1 = float(job1_data.get("progress", 0.0))
-            state1 = job1_data.get("state")
+            state1 = job1_data.get("state") 
         
-        # JOB 2
+        #Job2
         p2 = 0.0
         state2 = "PENDING"
         if job2_data:
             p2 = float(job2_data.get("progress", 0.0))
             state2 = job2_data.get("state")
             
-        # JOB 3
+        #Job3
         p3 = 0.0
         state3 = "PENDING"
         if job3_data:
             p3 = float(job3_data.get("progress", 0.0))
             state3 = job3_data.get("state")
 
-        # Set pipeline status
+        #set pipeline status
         global_status = "RUNNING"
         if "FAILED" in [state1, state2, state3] or "KILLED" in [state1, state2, state3]:
             global_status = "FAILED"
@@ -217,7 +213,7 @@ def get_pipeline(pipeline_id):
         return jsonify({'error': f'Error computing pipeline status: {str(e)}'}), 500
     
 
-# GET Endpoint to show all the jobs in Hadoop
+#GET Endpoint to show all the jobs in Hadoop
 @app.route('/jobs/hadoop', methods=['GET'])
 def list_jobs():
     yarn_url = f"http://{hostname}:8088/ws/v1/cluster/apps?applicationTypes=MAPREDUCE"
@@ -229,7 +225,7 @@ def list_jobs():
         
         apps_container = json_data.get("apps")
         if not apps_container:
-            return jsonify([]), 200  # Return an empty list if the cluster has not a job
+            return jsonify([]), 200  #return an empty list if the cluster has not a job
             
         apps_list = apps_container.get("app", [])
             
@@ -239,65 +235,62 @@ def list_jobs():
         return jsonify({'error': f'Connection error to YARN: {e}'}), 500
 
 
-# GET Endpoint to return the result of a job in Hadoop
+#GET Endpoint to return the result of a job in Hadoop
 @app.route('/jobs/hadoop/<job_id>/result', methods=['GET'])
 def get_job_result(job_id):
     yarn_url = f"http://{hostname}:8088/ws/v1/cluster/apps/{job_id}"
-
     response_yarn = requests.get(yarn_url, timeout=10)
     
-    # If YARN responds with 404, the job does not exist
+    #if YARN responds with 404, the job does not exist
     if response_yarn.status_code == 404:
         return jsonify({'error': 'Job not found on YARN'}), 404
         
     response_yarn.raise_for_status()
     
-    # Extract the "app" object from the YARN JSON
+    #extract the "app" object from the JSON
     data_app = response_yarn.json().get('app', {})
     
-    # Status check: is it finished?
     status = data_app.get('state')
     if status != 'FINISHED':
         return jsonify({'error': f'Result not available. Job status: {status}'}), 400
         
-    # Extract the tag (which acts as the folder name)
+    #extract the tag (which acts as the folder name)
     job_tag = data_app.get('applicationTags')
     if not job_tag:
         return jsonify({'error': 'This job has not a tag associated to find output folder'}), 400
     
     all_content = b""
     
-    #per prendere tutti gli output
-    for i in range(10):  # prova fino a part-r-00009
+    for i in range(10):  
         part_name = f"part-r-{str(i).zfill(5)}"
-        webhdfs_url = f"http://{hostname}:9870/webhdfs/v1/user/hadoop/{job_tag}/{part_name}?op=OPEN" # Call to the NameNode to obtain the result
+        webhdfs_url = f"http://{hostname}:9870/webhdfs/v1/user/hadoop/{job_tag}/{part_name}?op=OPEN" #call to the NameNode to obtain the result 
 
         try:
-            # Set allow_redirects=False to block automatic redirects
+            #set allow_redirects=False to block automatic redirects
             response_namenode = requests.get(webhdfs_url, allow_redirects=False, timeout=10)
             
-            # Check if it responded with a Redirect 
+            #check if it responded with a Redirect 
             if response_namenode.status_code == 307:
-                # Extract the "wrong" URL from the datanode
+                #extract the "wrong" URL from the datanode
                 redirect_url = response_namenode.headers['Location']
                 
-                # Replace hostnames impossible to resolve with our VM's IP
+                #replace hostnames impossible to resolve with our VM's IP
                 correct_redirect_url = redirect_url.replace('hadoop-datanode-3', '10.1.1.143')
                 correct_redirect_url = correct_redirect_url.replace('hadoop-datanode-2', '10.1.1.111')
                 correct_redirect_url = correct_redirect_url.replace('hadoop-namenode', '10.1.1.124')
                 
-                # Execute redirected request
-                final_response = requests.get(correct_redirect_url, stream=True, timeout=30)
+                #execute redirected request
+                final_response = requests.get(correct_redirect_url, stream=True, timeout=30) 
                 final_response.raise_for_status()
-                all_content += final_response.content
+                all_content += final_response.content 
 
-            elif response_namenode.status_code == 404:
-                break  # non ci sono altri part file
+            elif response_namenode.status_code == 404: 
+                break  
                 
         except requests.exceptions.RequestException:
             break
 
-    if not all_content:
+    if not all_content: 
         return jsonify({'error': 'No result files found'}), 404
     
     return Response(
@@ -305,9 +298,9 @@ def get_job_result(job_id):
         content_type='text/plain',
         headers={"Content-Disposition": f"attachment; filename=result_{job_id}.txt"}
     )
-    
 
-# GET Endpoint to monitor the status of a single Job (both for Hadoop and Spark)
+
+#GET Endpoint to monitor the status of a single Job (both for Hadoop and Spark)
 @app.route('/jobs/<job_id>', methods=['GET'])
 def get_job(job_id):
     yarn_url = f"http://{hostname}:8088/ws/v1/cluster/apps/{job_id}"
@@ -327,9 +320,10 @@ def get_job(job_id):
         return jsonify({'error': f'Connection error to YARN: {e}'}), 500
 
 
-# Spark
+#Spark
 
-# POST Endpoint to start job in Spark
+
+#POST Endpoint to start job in Spark
 @app.route('/jobs/spark', methods=['POST'])
 def create_spark_job():
     data = request.get_json() or {} 
@@ -342,28 +336,28 @@ def create_spark_job():
             "message": "Dataset is required"
         }), 400
 
-    # Job parameters
+    #job parameters
     min_reviews_perfect = data.get('minReviewsPerfect', 100)
     min_helpful_ratio = data.get('minHelpfulRatio', 0.2)
     min_verified_ratio = data.get('minVerifiedRatio', 0.5)
 
-    # Unique tag to identify the job
+    #unique tag to identify the job
     job_tag = str(uuid.uuid4())
     
-    # Output folders
+    #output folders
     output_ranking = f"{job_tag}_ranking"
     output_anomalies = f"{job_tag}_anomalies"
 
-    # Command spark-submit via SSH
+    #command spark-submit via SSH
     command = (
-        # Need to set hadoop bin path, because spark-submit internally uses hadoop
+        #need to set hadoop bin path, because spark-submit internally uses hadoop
         f"export PATH=$PATH:/opt/hadoop/bin && "
-        # HADOOP_CONF_DIR contains path of configuration files for hadoop
+        #HADOOP_CONF_DIR contains path of configuration files for hadoop
         f"export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop && "
         f"nohup /opt/spark/bin/spark-submit "
-        f"--master yarn " # use yarn to manage resources
-        f"--deploy-mode cluster "  # driver runs on a node of the cluster
-        f"--conf spark.yarn.tags=\"{job_tag}\" " # assign a unique tag to the yarn job
+        f"--master yarn " #use yarn to manage resources
+        f"--deploy-mode cluster "  #driver runs on a node of the cluster
+        f"--conf spark.yarn.tags=\"{job_tag}\" " #assign a unique tag to the yarn job
         f"/home/hadoop/amazon_project/spark/amazon_spark.py "
         f"{dataset} {output_ranking} {output_anomalies} "
         f"{min_reviews_perfect} {min_helpful_ratio} {min_verified_ratio} "
@@ -390,7 +384,6 @@ def create_spark_job():
                     "minHelpfulRatio": min_helpful_ratio,
                     "minVerifiedRatio": min_verified_ratio
                 }), 201
-            
             print(f"Retry {retry + 1}/{max_retries}: Spark job not yet on YARN. Waiting...")
             time.sleep(seconds_to_wait)
 
@@ -417,7 +410,7 @@ def list_spark_jobs():
         
         apps_container = json_data.get("apps")
         if not apps_container:
-            return jsonify([]), 200  # Return an empty list if the cluster has not a job
+            return jsonify([]), 200  #return an empty list if the cluster has not a job
             
         apps_list = apps_container.get("app", [])
         
@@ -427,10 +420,10 @@ def list_spark_jobs():
         return jsonify({'error': f'Connection error to YARN: {e}'}), 500
     
 
-# GET Endpoint to return the results of a job in Spark (ranking or anomalies)
+#GET Endpoint to return the results of a job in Spark (ranking or anomalies)
 @app.route('/jobs/spark/<job_id>/result/<output_type>', methods=['GET'])
 def get_spark_job_result(job_id, output_type):
-    # output_type can be 'ranking' or 'anomalies'
+    #spark produces two distinct outputs: 'ranking' or 'anomalies'
     if output_type not in ['ranking', 'anomalies']:
         return jsonify({'error': 'invalid output_type. Use "ranking" or "anomalies"'}), 400
 
@@ -451,11 +444,10 @@ def get_spark_job_result(job_id, output_type):
     if not job_tag:
         return jsonify({'error': 'No tag associated with this Job.'}), 400
     
-    # Spark file output name = part-00000
+    #spark file output name = part-00000
     target_folder = f"{job_tag}_{output_type}"
     all_content = b""
 
-    # Itera su tutti i part file (part-00000, part-00001, ...)
     for i in range(10):
         part_name = f"part-{str(i).zfill(5)}"
         webhdfs_url = f"http://{hostname}:9870/webhdfs/v1/user/hadoop/{target_folder}/{part_name}?op=OPEN"
@@ -475,7 +467,7 @@ def get_spark_job_result(job_id, output_type):
                 all_content += final_response.content
 
             elif response_namenode.status_code == 404:
-                break  # non ci sono altri part file
+                break  
 
         except requests.exceptions.RequestException:
             break
@@ -489,7 +481,7 @@ def get_spark_job_result(job_id, output_type):
         headers={"Content-Disposition": f"attachment; filename={output_type}_{job_id}.txt"}
     )
 
-# html page
+#html page
 @app.route('/')
 def home():
     return send_file('index.html')
