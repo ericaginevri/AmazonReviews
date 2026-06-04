@@ -55,8 +55,7 @@ if __name__ == "__main__":
 
     #compute score
     ranking = []
-    anomalies = []
-
+    
     for product_parent, data in products.items():
         avg_rating = (
             data["rating_sum"] /
@@ -78,6 +77,11 @@ if __name__ == "__main__":
             math.log(1 + data["review_count"]) *
             (1 + helpful_ratio)
         )
+        
+        data["avg_rating"] = avg_rating
+        data["helpful_ratio"] = helpful_ratio
+        data["verified_ratio"] = verified_ratio
+        data["score"] = score
 
         ranking.append(
             (
@@ -88,7 +92,26 @@ if __name__ == "__main__":
             )
         )
 
-        #anomaly detection
+    #sort ranking
+    ranking.sort(
+        key=lambda x: x[3],
+        reverse=True
+    )
+
+    #anomaly detection 
+    anomalies = []
+    
+    for index, p in enumerate(ranking):
+        rank_position = index + 1
+        product_parent = p[0]
+        score = p[3]
+        data = products[product_parent]
+        
+        avg_rating = data["avg_rating"]
+        helpful_ratio = data["helpful_ratio"]
+        verified_ratio = data["verified_ratio"]
+        review_count = data["review_count"]
+
         if score > 20 and helpful_ratio < 0.2:
             anomalies.append(
                 (
@@ -98,7 +121,7 @@ if __name__ == "__main__":
                 )
             )
 
-        if verified_ratio < 0.5 and data["review_count"] > 100:
+        if verified_ratio < 0.5 and review_count > 100:
             anomalies.append(
                 (
                     product_parent,
@@ -107,7 +130,7 @@ if __name__ == "__main__":
                 )
             )
 
-        if avg_rating > 4.9 and data["review_count"] > 100:
+        if avg_rating > 4.9 and review_count > 100:
             anomalies.append(
                 (
                     product_parent,
@@ -115,17 +138,21 @@ if __name__ == "__main__":
                     score
                 )
             )
+        
+        if rank_position <= 10 and avg_rating < 3.5:
+            anomalies.append(
+                (
+                    product_parent,
+                    "RANK_INCONSISTENCY",
+                    score
+                )
+            )
 
-    #sort ranking
-    ranking.sort(
-        key=lambda x: x[3],
-        reverse=True
-    )
 
     end_time = time.time()
 
     #statistics
-    print("\n===== EXECUTION STATISTICS =====")
+    print("\nExecution statistics")
     print(
         f"Execution time: "
         f"{end_time - start_time:.2f} sec"
@@ -138,17 +165,17 @@ if __name__ == "__main__":
         f"Anomalies found: "
         f"{len(anomalies)}"
     )
-    print("\n===== TOP 10 PRODUCTS =====")
+    print("\nTop 10 products")
 
     for p in ranking[:10]:
         print(
             f"{p[0]} | "
             f"{p[1]} | "
             f"{p[2]} | "
-            f"{p[3]}"
+            f"{p[3]:.2f}"
         )
 
-    print("\n===== FIRST 10 ANOMALIES =====")
+    print("\nFirst 10 anomalies")
 
     for a in anomalies[:10]:
         print(a)
