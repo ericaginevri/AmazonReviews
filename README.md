@@ -1,46 +1,38 @@
-# Amazon Reviews Project
+# Amazon Reviews
 *Cloud Computing Project — Academic Year 2025/2026*
 
-Welcome to the repository of the **MirandaPriestley Group**, created for our Cloud Computing final project.
+A big-data pipeline that analyses Amazon product reviews with **Hadoop MapReduce** and **Apache Spark**, and serves the results through a **REST API**.
 
-**Team Members:**
-* Erica Ginevri
-* Chiara Nasoni
-* Vittoria Vellutini
+**Team (MirandaPriestley Group):** Erica Ginevri, Chiara Nasoni, Vittoria Vellutini
 
+## 🔎 What it does
 
-## 📁 Project Structure
+The pipeline is made of three chained MapReduce jobs:
 
-The files and directories for this project are hosted on the Virtual Machine (VM) with the IP address **10.1.1.124**, which acts as a *datanode-namenode* within our Hadoop environment. 
+1. **Aggregation**: groups the reviews by product and computes review count, average rating, verified reviews and helpful votes.
+2. **Ranking**: gives every product a score that balances rating, review volume and helpfulness, `avg_rating × log(1 + reviews) × (1 + helpful / (1 + total votes))`, and ranks the products within each category.
+3. **Anomaly detection**: flags products whose score is not backed by the evidence, for example a high score with few helpful votes or few verified purchases.
 
-The layout is divided between the `root` and `hadoop` user environments:
+The same pipeline is also implemented in Spark, to compare the two approaches. The full analysis is in [`REPORT.pdf`](REPORT.pdf).
 
-* The `root` user directory (accessible via `ssh root@10.1.1.124` and password `ubuntu`) contains:
-  * `amazon-rest/`: which contains all the files and components for both the REST server and the REST client.
+## 📁 Project structure
 
-* The `hadoop` user directory (accessible via `sudo su -- hadoop` and password `miranda`) contains, after done `cd` command:
-  * `amazon_project/`: which is the main directory containing the components as follow:
-    * `spark/`: contains amazon_spark.py
-    * `amazon_project/`: contains all Hadoop-related files
-    * `non_parallel_execution.py`: a Python script for managing Hadoop parallel execution
+```
+amazon_project/            Hadoop MapReduce jobs (Java, Maven)
+spark/amazon_spark.py      Spark version of the pipeline (PySpark)
+amazon_rest/               REST server and web client (Python, Docker)
+non_parallel_execution.py  Script that manages the execution of the Hadoop jobs
+REPORT.pdf                 Project report
+```
 
+## 🚀 Getting started
 
-## 🚀 Getting Started
+The jobs ran on the course's Hadoop cluster, reachable through the university VPN. To start the REST server:
 
-To run the project and start the REST server, follow these steps:
-
-1. Activate the VPN
-2. Access the Virtual Machine
-3. Navigate to the REST directory:
 ```bash
 cd amazon_rest
-```
-4. Build the Docker image: compile the container for the REST server
-```bash
 docker build -t rest-server .
-```
-5. Run the server: start the container and map port 8080
-```bash
 docker run -p 8080:8080 rest-server
 ```
-6. Access the Application: once the server is running, you can interact with the REST API by navigating to the following URL in your web browser: http://10.1.1.124:8080
+
+Then open `http://<host>:8080` in your browser to explore the results.
